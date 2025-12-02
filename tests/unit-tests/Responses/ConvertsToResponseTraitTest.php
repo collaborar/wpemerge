@@ -35,7 +35,7 @@ class ConvertsToResponseTraitTest extends TestCase {
 
 		$this->response_service->shouldReceive( 'output' )
 			->andReturnUsing( function ( $output ) {
-				return (new Psr7Response())->withBody( Psr7\stream_for( $output ) );
+				return (new Psr7Response())->withBody( Psr7\Utils::streamFor( $output ) );
 			} );
 
 		$response = $this->subject->publicToResponse( $expected );
@@ -51,7 +51,7 @@ class ConvertsToResponseTraitTest extends TestCase {
 
 		$this->response_service->shouldReceive( 'json' )
 			->andReturnUsing( function ( $data ) {
-				return (new Psr7Response())->withBody( Psr7\stream_for( json_encode( $data ) ) );
+				return (new Psr7Response())->withBody( Psr7\Utils::streamFor( json_encode( $data ) ) );
 			} );
 
 		$response = $this->subject->publicToResponse( $input );
@@ -92,7 +92,7 @@ class ConvertsToResponseTraitImplementation {
 		$this->response_service = $response_service;
 	}
 
-	protected function getResponseService() {
+	protected function getResponseService(): ResponseService {
 		return $this->response_service;
 	}
 

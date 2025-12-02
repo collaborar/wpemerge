@@ -40,7 +40,7 @@ class ExecutesMiddlewareTraitTest extends TestCase {
 			[],
 			$this->request,
 			function () {
-				return (new Psr7Response())->withBody( Psr7\stream_for( 'Handler' ) );
+				return (new Psr7Response())->withBody( Psr7\Utils::streamFor( 'Handler' ) );
 			}
 		);
 
@@ -64,7 +64,7 @@ class ExecutesMiddlewareTraitTest extends TestCase {
 			],
 			$this->request,
 			function () {
-				return (new Psr7Response())->withBody( Psr7\stream_for( 'Handler' ) );
+				return (new Psr7Response())->withBody( Psr7\Utils::streamFor( 'Handler' ) );
 			}
 		);
 
@@ -86,7 +86,7 @@ class ExecutesMiddlewareTraitTest extends TestCase {
 			],
 			$this->request,
 			function () {
-				return (new Psr7Response())->withBody( Psr7\stream_for( 'Handler' ) );
+				return (new Psr7Response())->withBody( Psr7\Utils::streamFor( 'Handler' ) );
 			}
 		);
 
@@ -103,7 +103,7 @@ class ExecutesMiddlewareTraitImplementation {
 		$this->factory = $factory;
 	}
 
-	protected function makeMiddleware( $class ) {
+	protected function makeMiddleware( $class ): object {
 		return $this->factory->make( $class );
 	}
 

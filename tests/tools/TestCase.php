@@ -5,6 +5,7 @@ namespace WPEmergeTestTools;
 use WP_UnitTest_Factory;
 use Yoast\PHPUnitPolyfills\TestCases\TestCase as TestCasePolyfill;
 
+#[\AllowDynamicProperties]
 class TestCase extends TestCasePolyfill {
 	/**
 	 * Get a WP_UnitTest_Factory instance.

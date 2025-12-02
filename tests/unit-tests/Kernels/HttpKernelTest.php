@@ -125,7 +125,7 @@ class HttpKernelTest extends TestCase {
 	 */
 	public function testRun_Middleware_ExecutedInOrder() {
 		$handler = function () {
-			return ( new Psr7\Response() )->withBody( Psr7\stream_for( 'Handler' ) );
+			return ( new Psr7\Response() )->withBody( Psr7\Utils::streamFor( 'Handler' ) );
 		};
 
 		$this->factory_handler->shouldReceive( 'make' )
@@ -486,7 +486,7 @@ class HttpKernelTestMiddlewareStub1 {
 	public function handle( RequestInterface $request, Closure $next ) {
 		$response = $next( $request );
 
-		return $response->withBody( Psr7\stream_for( 'Foo' . $response->getBody()->read( 999 ) ) );
+		return $response->withBody( Psr7\Utils::streamFor( 'Foo' . $response->getBody()->read( 999 ) ) );
 	}
 }
 
@@ -494,7 +494,7 @@ class HttpKernelTestMiddlewareStub2 {
 	public function handle( RequestInterface $request, Closure $next ) {
 		$response = $next( $request );
 
-		return $response->withBody( Psr7\stream_for( 'Bar' . $response->getBody()->read( 999 ) ) );
+		return $response->withBody( Psr7\Utils::streamFor( 'Bar' . $response->getBody()->read( 999 ) ) );
 	}
 }
 
@@ -502,7 +502,7 @@ class HttpKernelTestMiddlewareStub3 {
 	public function handle( RequestInterface $request, Closure $next ) {
 		$response = $next( $request );
 
-		return $response->withBody( Psr7\stream_for( 'Baz' . $response->getBody()->read( 999 ) ) );
+		return $response->withBody( Psr7\Utils::streamFor( 'Baz' . $response->getBody()->read( 999 ) ) );
 	}
 }
 
@@ -510,6 +510,6 @@ class HttpKernelTestMiddlewareStubWithParameters {
 	public function handle( RequestInterface $request, Closure $next, $param1, $param2 ) {
 		$response = $next( $request );
 
-		return $response->withBody( Psr7\stream_for( $param1 . $param2 . $response->getBody()->read( 999 ) ) );
+		return $response->withBody( Psr7\Utils::streamFor( $param1 . $param2 . $response->getBody()->read( 999 ) ) );
 	}
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	bootstrap="./tests/bootstrap.php"
 	colors="true"
 	stopOnError="false"
@@ -9,20 +10,21 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	backupGlobals="false"
+	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 	>
+	<coverage processUncoveredFiles="true">
+		<include>
+			<directory suffix=".php">./src</directory>
+		</include>
+		<exclude>
+			<directory suffix=".php">./src/Exceptions/Whoops</directory>
+			<directory suffix=".php">./src/Support</directory>
+			<file>./src/view.php</file>
+		</exclude>
+	</coverage>
 	<testsuites>
 		<testsuite name="WPEmerge Test Suite">
 			<directory suffix=".php">./tests/unit-tests/</directory>
 		</testsuite>
 	</testsuites>
-	<filter>
-		<whitelist processUncoveredFilesFromWhitelist="true">
-			<directory suffix=".php">./src</directory>
-			<exclude>
-				<directory suffix=".php">./src/Exceptions/Whoops</directory>
-				<directory suffix=".php">./src/Support</directory>
-				<file>./src/view.php</file>
-			</exclude>
-		</whitelist>
-	</filter>
 </phpunit>

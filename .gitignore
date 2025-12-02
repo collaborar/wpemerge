@@ -12,3 +12,6 @@
 
 # phpunit
 .clover.xml
+
+# ignore
+.ignore

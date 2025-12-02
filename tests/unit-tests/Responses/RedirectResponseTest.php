@@ -65,7 +65,7 @@ class RedirectResponseTest extends TestCase {
 
 		$request->shouldReceive( 'getHeaderLine' )
 			->with( 'Referer' )
-			->andReturn( null );
+			->andReturn( '' );
 
 		$subject = (new RedirectResponse( $request ))->back( $expected );
 		$this->assertEquals( $expected, $subject->getHeaderLine( 'Location' ) );
@@ -80,7 +80,7 @@ class RedirectResponseTest extends TestCase {
 
 		$request->shouldReceive( 'getHeaderLine' )
 			->with( 'Referer' )
-			->andReturn( null );
+			->andReturn( '' );
 
 		$request->shouldReceive( 'getUrl' )
 			->andReturn( $expected );

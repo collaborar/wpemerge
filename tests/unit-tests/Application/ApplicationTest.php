@@ -113,6 +113,7 @@ class ApplicationTest extends TestCase {
 	}
 }
 
+#[\AllowDynamicProperties]
 class ApplicationTestServiceProviderMock implements ServiceProviderInterface {
 	public function __construct() {
 		$this->mock = Mockery::mock( ServiceProviderInterface::class );
@@ -131,6 +132,7 @@ class ApplicationTestServiceProviderMock implements ServiceProviderInterface {
 	}
 }
 
+#[\AllowDynamicProperties]
 class ApplicationTestKernelServiceProviderMock implements ServiceProviderInterface {
 	public function register( $container ) {
 		$mock = Mockery::mock();

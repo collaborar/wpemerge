@@ -43,7 +43,7 @@ class MixedType {
 		$entity,
 		$arguments = [],
 		$method = '__invoke',
-		$instantiator = 'static::instantiate'
+		$instantiator = null
 	) {
 		if ( is_callable( $entity ) ) {
 			return call_user_func_array( $entity, $arguments );
@@ -54,6 +54,7 @@ class MixedType {
 		}
 
 		if ( static::isClass( $entity ) ) {
+			$instantiator = $instantiator ?? [static::class, 'instantiate'];
 			return call_user_func_array( [call_user_func( $instantiator, $entity ), $method], $arguments );
 		}
 

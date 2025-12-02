@@ -84,7 +84,7 @@ class ErrorHandlerTest extends TestCase {
 			->andReturnUsing( function ( $data ) {
 				return (new Response())
 					->withHeader( 'Content-Type', 'application/json' )
-					->withBody( Psr7\stream_for( wp_json_encode( $data ) ) );
+					->withBody( Psr7\Utils::streamFor( wp_json_encode( $data ) ) );
 			} );
 
 		$response = $subject->getResponse( $request, $exception );
@@ -122,7 +122,7 @@ class ErrorHandlerTest extends TestCase {
 		$this->response_service->shouldReceive( 'output' )
 			->andReturnUsing( function ( $output ) {
 				return (new Response())
-					->withBody( Psr7\stream_for( $output ) );
+					->withBody( Psr7\Utils::streamFor( $output ) );
 			} );
 
 		$subject = new ErrorHandler( $this->response_service, $whoops, true );
