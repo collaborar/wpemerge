@@ -1,6 +1,12 @@
 name: PHPUnit Tests
 
-on: push
+on:
+  push:
+    paths:
+      - '**.php'
+      - '**/workflows/**'
+      - 'composer.json'
+      - 'phpunit.xml'
 
 permissions:
   contents: read
