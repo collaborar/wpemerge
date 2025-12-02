@@ -65,13 +65,3 @@ jobs:
 
       - name: Run tests
         run: composer run test
-
-      - name: Set up PHP 7.x for Scrutinizer
-        if: ${{ matrix.php-versions >= 8.0 }}
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 7.4
-          coverage: xdebug
-
-      - name: Upload coverage to Scrutinizer-CI.
-        run: wget https://scrutinizer-ci.com/ocular.phar && php ocular.phar code-coverage:upload --format=php-clover ./tmp/clover.xml
