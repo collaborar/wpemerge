@@ -23,7 +23,7 @@
     "issues": "https://github.com/collaborar/wpemerge/issues"
   },
   "require": {
-    "php": ">=8.4",
+    "php": ">=8.1",
     "pimple/pimple": "^3.5",
     "guzzlehttp/psr7": "^2.7",
     "psr/container": "^2.0"
