@@ -1,5 +1,5 @@
 {
-  "name": "htmlburger/wpemerge",
+  "name": "collaborar/wpemerge",
   "description": "A micro framework which modernizes WordPress as a CMS development by providing tools to implement MVC and more.",
   "type": "library",
   "keywords": ["wordpress", "framework", "controller", "template", "view", "request", "response", "middleware", "wpemerge"],
@@ -10,19 +10,17 @@
       "name": "Atanas Angelov",
       "email": "hi@atanas.dev",
       "homepage": "https://atanas.dev/",
-      "role": "Developer"
+      "role": "Creator"
     },
     {
-      "name": "htmlBurger",
-      "email": "info@htmlburger.com",
-      "homepage": "http://htmlburger.com/",
+      "name": "Paulo Ferreira",
+      "email": "paulo@collaborar.com",
       "role": "Developer"
     }
   ],
   "support": {
-    "source": "https://github.com/htmlburger/wpemerge",
-    "issues": "https://github.com/htmlburger/wpemerge/issues",
-    "email": "wordpress@htmlburger.com"
+    "source": "https://github.com/collaborar/wpemerge",
+    "issues": "https://github.com/collaborar/wpemerge/issues"
   },
   "require": {
     "php": ">=8.4",

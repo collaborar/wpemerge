@@ -2,6 +2,8 @@
 
 [![Packagist](https://img.shields.io/packagist/vpre/htmlburger/wpemerge.svg?style=flat-square&colorB=0366d6)](https://packagist.org/packages/htmlburger/wpemerge) [![Build](https://img.shields.io/github/workflow/status/htmlburger/wpemerge/PHPUnit%20Tests?style=flat-square)](https://github.com/htmlburger/wpemerge/actions/workflows/phpunit.yml) [![Scrutinizer](https://img.shields.io/scrutinizer/g/htmlburger/wpemerge.svg?style=flat-square)](https://scrutinizer-ci.com/g/htmlburger/wpemerge/) [![Scrutinizer Coverage](https://img.shields.io/scrutinizer/coverage/g/htmlburger/wpemerge.svg?style=flat-square)](https://scrutinizer-ci.com/g/htmlburger/wpemerge/code-structure/master/code-coverage) [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?style=flat-square&colorB=7d07d1)](https://gitter.im/wpemerge/Lobby)
 
+_This is a fork of [htmlburger/wpemerge](https://github.com/htmlburger/wpemerge)_
+
 📦 A micro framework which modernizes WordPress as a CMS development by providing tools to implement MVC and more.
 
 🔥 Integration is incremental - you can use it only on the pages you want or on all pages.
