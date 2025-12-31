@@ -24,7 +24,7 @@
 		</div>
 	</div>
 
-	<script><?php echo $prettify ?></script>
+	<script data-manual><?php echo $prismJs ?></script>
 	<script><?php echo $zepto ?></script>
 	<script><?php echo $clipboard ?></script>
 	<script><?php echo $javascript ?></script>
