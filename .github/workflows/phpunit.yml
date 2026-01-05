@@ -28,6 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          coverage: xdebug
+
       - uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: '5.7'
@@ -43,12 +49,6 @@ jobs:
 
       - name: Install WordPress
         run: bash tests/bin/install.sh wpemerge_tests root '' 127.0.0.1 ${{ matrix.wp-versions }}
-
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-versions }}
-          coverage: xdebug
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
