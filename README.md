@@ -12,8 +12,8 @@ _This is a fork of [htmlburger/wpemerge](https://github.com/htmlburger/wpemerge)
 
 ## Requirements
 
-- [PHP](http://php.net/) >= 8.1
-- [WordPress](https://wordpress.org/) >= 6.5
+- [PHP](http://php.net/) >= 8.4
+- [WordPress](https://wordpress.org/) >= 6.8
 - [Composer](https://getcomposer.org/)
 
 ## Features & Documentation
