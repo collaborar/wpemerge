@@ -2,12 +2,12 @@
 
 WP Emerge is completely open source and we encourage everybody to participate by:
 
-- ⭐ the project on GitHub (https://github.com/htmlburger/wpemerge)
-- Posting bug reports (https://github.com/htmlburger/wpemerge/issues)
+- ⭐ the project on GitHub (https://github.com/collaborar/wpemerge)
+- Posting bug reports (https://github.com/collaborar/wpemerge/issues)
 - (Emailing security issues to [hi@atanas.dev](mailto:hi@atanas.dev) instead)
-- Posting feature suggestions (https://github.com/htmlburger/wpemerge/issues)
-- Posting and/or answering questions (https://github.com/htmlburger/wpemerge/issues)
-- Submitting pull requests (https://github.com/htmlburger/wpemerge/pulls)
+- Posting feature suggestions (https://github.com/collaborar/wpemerge/issues)
+- Posting and/or answering questions (https://github.com/collaborar/wpemerge/issues)
+- Submitting pull requests (https://github.com/collaborar/wpemerge/pulls)
 - Sharing your excitement about WP Emerge with your community
 
 ## Development setup

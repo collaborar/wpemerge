@@ -2,52 +2,52 @@
 
 This guide covers all the steps required to release a new version for all packages. The order of packages must be followed but packages that do not have a new version to be released can be skipped (keeping the rest in order).
 
-## 1. htmlburger/wpemerge
+## 1. collaborar/wpemerge
 
 1. Update and commit WPEMERGE_VERSION in `config.php` with the latest version.
-2. Create a new release: https://github.com/htmlburger/wpemerge/releases/new
+2. Create a new release: https://github.com/collaborar/wpemerge/releases/new
 
-## 2. htmlburger/wpemerge-cli
+## 2. collaborar/wpemerge-cli
 
 1. Update and commit `composer.json` with the latest version of this package (otherwise packagist.org will not update).
-2. Create a new release: https://github.com/htmlburger/wpemerge-cli/releases/new
+2. Create a new release: https://github.com/collaborar/wpemerge-cli/releases/new
 
-## 3. htmlburger/wpemerge-blade
+## 3. collaborar/wpemerge-blade
 
-1. Update and commit `composer.json` with the latest `htmlburger/wpemerge` version requirement.
-2. Create a new release: https://github.com/htmlburger/wpemerge-blade/releases/new
+1. Update and commit `composer.json` with the latest `collaborar/wpemerge` version requirement.
+2. Create a new release: https://github.com/collaborar/wpemerge-blade/releases/new
 
-## 4. htmlburger/wpemerge-twig
+## 4. collaborar/wpemerge-twig
 
-1. Update and commit `composer.json` with the latest `htmlburger/wpemerge` version requirement.
-2. Create a new release: https://github.com/htmlburger/wpemerge-twig/releases/new
+1. Update and commit `composer.json` with the latest `collaborar/wpemerge` version requirement.
+2. Create a new release: https://github.com/collaborar/wpemerge-twig/releases/new
 
-## 5. htmlburger/wpemerge-app-core
+## 5. collaborar/wpemerge-app-core
 
-1. Update and commit `composer.json` with the latest `htmlburger/wpemerge` version requirement.
-2. Create a new release: https://github.com/htmlburger/wpemerge-app-core/releases/new
+1. Update and commit `composer.json` with the latest `collaborar/wpemerge` version requirement.
+2. Create a new release: https://github.com/collaborar/wpemerge-app-core/releases/new
 
-## 6. htmlburger/wpemerge-theme
+## 6. collaborar/wpemerge-theme
 
 1. Run `yarn i18n`.
 2. Update `composer.json` with the latest version requirements for:
-    - `htmlburger/wpemerge`
-    - `htmlburger/wpemerge-app-core`
-    - `htmlburger/wpemerge-cli`
+    - `collaborar/wpemerge`
+    - `collaborar/wpemerge-app-core`
+    - `collaborar/wpemerge-cli`
 3. Update `composer.json` with the latest version of this package (otherwise packagist.org will not update).
 4. Update call to `my_app_should_load_wpemerge()` with the latest minimum version required.
 5. Commit.
-6. Create a new release: https://github.com/htmlburger/wpemerge-theme/releases/new
+6. Create a new release: https://github.com/collaborar/wpemerge-theme/releases/new
 7. Update the composer example in the Quickstart docs for Bedrock with the exact new version number.
 
-## 7. htmlburger/wpemerge-plugin
+## 7. collaborar/wpemerge-plugin
 
 1. Run `yarn i18n`.
 2. Update `composer.json` with the latest version requirements for:
-    - `htmlburger/wpemerge`
-    - `htmlburger/wpemerge-app-core`
-    - `htmlburger/wpemerge-cli`
+    - `collaborar/wpemerge`
+    - `collaborar/wpemerge-app-core`
+    - `collaborar/wpemerge-cli`
 3. Update `composer.json` with the latest version of this package (otherwise packagist.org will not update).
 4. Update call to `my_app_should_load_wpemerge()` with the latest minimum version required.
 5. Commit.
-6. Create a new release: https://github.com/htmlburger/wpemerge-plugin/releases/new
+6. Create a new release: https://github.com/collaborar/wpemerge-plugin/releases/new
