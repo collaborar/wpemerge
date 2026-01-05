@@ -1,6 +1,7 @@
 name: PHPUnit Tests
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - '**.php'
