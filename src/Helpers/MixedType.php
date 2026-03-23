@@ -72,6 +72,17 @@ class MixedType {
 	}
 
 	/**
+	 * Get the class "basename" of the given object / class.
+	 *
+	 * @param mixed $class_name
+	 * @return string
+	 */
+	public static function classBasename( $class_name ) {
+		$class_name = is_object( $class_name ) ? get_class( $class_name ) : $class_name;
+		return basename( str_replace( '\\', '/', $class_name ) );
+	}
+
+	/**
 	 * Create a new instance of the given class.
 	 *
 	 * @param  string $class_name
