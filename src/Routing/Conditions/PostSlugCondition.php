@@ -37,7 +37,7 @@ class PostSlugCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		$post = get_post();
 		return ( is_singular() && $post && $this->post_slug === $post->post_name );
 	}
@@ -45,7 +45,7 @@ class PostSlugCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['post_slug' => $this->post_slug];
 	}
 }

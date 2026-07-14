@@ -9,98 +9,76 @@
 
 namespace WPEmerge\Exceptions;
 
-use Pimple\Container;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
+use WPEmerge\Application\Configuration;
 use WPEmerge\Exceptions\Whoops\DebugDataProvider;
+use WPEmerge\Responses\ResponseService;
 use WPEmerge\ServiceProviders\ExtendsConfigTrait;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
 
 /**
  * Provide exceptions dependencies.
  *
  * @codeCoverageIgnore
  */
-class ExceptionsServiceProvider implements ServiceProviderInterface {
+class ExceptionsServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 	use ExtendsConfigTrait;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$debug = defined( 'WP_DEBUG' ) && WP_DEBUG;
-
-		$this->extendConfig( $container, 'debug', [
-			'enable' => $debug,
-			'pretty_errors' => $debug,
-		] );
-
-		$this->registerPrettyErrorHandler( $container );
-		$this->registerErrorHandler( $container );
+	public function provides( string $id ): bool {
+		return in_array( $id, [
+			DebugDataProvider::class,
+			PrettyPageHandler::class,
+			Run::class,
+			ErrorHandlerInterface::class,
+		], true );
 	}
 
-	/**
-	 * Register the pretty error handler service.
-	 *
-	 * @param Container $container
-	 */
-	protected function registerPrettyErrorHandler( $container ) {
-		$container[ DebugDataProvider::class ] = function ( $container ) {
-			return new DebugDataProvider( $container );
-		};
+	public function boot(): void {
+		$debug = defined( 'WP_DEBUG' ) && WP_DEBUG;
+		$this->extendConfig( 'debug', [
+			'enable'        => $debug,
+			'pretty_errors' => $debug,
+		] );
+	}
 
-		$container[ PrettyPageHandler::class ] = function ( $container ) {
+	public function register(): void {
+		$c = $this->getContainer();
+
+		$c->addShared( DebugDataProvider::class )->addArguments( [ ContainerInterface::class ] );
+
+		$c->addShared( PrettyPageHandler::class, function () use ( $c ) {
 			$handler = new PrettyPageHandler();
 			$handler->addResourcePath( implode( DIRECTORY_SEPARATOR, [WPEMERGE_DIR, 'src', 'Exceptions', 'Whoops'] ) );
-
-			$handler->addDataTableCallback( 'WP Emerge: Route', function ( $inspector ) use ( $container ) {
-				return $container[ DebugDataProvider::class ]->route( $inspector );
+			$handler->addDataTableCallback( 'WP Emerge: Route', function ( $inspector ) use ( $c ) {
+				return $c->get( DebugDataProvider::class )->route( $inspector );
 			} );
-
 			return $handler;
-		};
+		} );
 
-		$container[ Run::class ] = function ( $container ) {
+		$c->addShared( Run::class, function () use ( $c ) {
 			if ( ! class_exists( Run::class ) ) {
 				return null;
 			}
-
 			$run = new Run();
 			$run->allowQuit( false );
-
-			$handler = $container[ PrettyPageHandler::class ];
-
+			$handler = $c->get( PrettyPageHandler::class );
 			if ( $handler ) {
 				$run->pushHandler( $handler );
 			}
-
 			return $run;
-		};
-	}
+		} );
 
-	/**
-	 * Register the error handler service.
-	 *
-	 * @param Container $container
-	 */
-	protected function registerErrorHandler( $container ) {
-		$container[ WPEMERGE_EXCEPTIONS_ERROR_HANDLER_KEY ] = function ( $container ) {
-			$debug = $container[ WPEMERGE_CONFIG_KEY ]['debug'];
-			$whoops = $debug['pretty_errors'] ? $container[ Run::class ] : null;
-			return new ErrorHandler( $container[ WPEMERGE_RESPONSE_SERVICE_KEY ], $whoops, $debug['enable'] );
-		};
-
-		$container[ WPEMERGE_EXCEPTIONS_CONFIGURATION_ERROR_HANDLER_KEY ] = function ( $container ) {
-			$debug = $container[ WPEMERGE_CONFIG_KEY ]['debug'];
-			$whoops = $debug['pretty_errors'] ? $container[ Run::class ] : null;
-			return new ErrorHandler( $container[ WPEMERGE_RESPONSE_SERVICE_KEY ], $whoops, $debug['enable'] );
-		};
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+		$c->addShared( ErrorHandlerInterface::class, function () use ( $c ) {
+			$debug  = $c->get( Configuration::class )->get( 'debug', [] );
+			$whoops = ( $debug['pretty_errors'] ?? false ) ? $c->get( Run::class ) : null;
+			return new ErrorHandler(
+				$c->get( ResponseService::class ),
+				$whoops,
+				$debug['enable'] ?? false
+			);
+		} );
 	}
 }

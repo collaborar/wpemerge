@@ -9,7 +9,7 @@
 
 namespace WPEmerge\Application;
 
-use Pimple\Container;
+use League\Container\Container;
 use Psr\Http\Message\ResponseInterface;
 use WPEmerge\Requests\RequestInterface;
 use WPEmerge\Responses\RedirectResponse;

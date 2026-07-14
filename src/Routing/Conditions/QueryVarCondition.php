@@ -46,7 +46,7 @@ class QueryVarCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		$query_var_value = get_query_var( $this->query_var, null );
 
 		if ( $query_var_value === null ) {
@@ -63,7 +63,7 @@ class QueryVarCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['query_var' => $this->query_var, 'value' => $this->value];
 	}
 }

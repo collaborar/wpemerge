@@ -2,71 +2,53 @@
 
 namespace WPEmergeTests\ServiceProviders;
 
-use Pimple\Container;
-use WPEmerge\ServiceProviders\ExtendsConfigTrait;
+use WPEmerge\Application\Configuration;
 use WPEmergeTestTools\TestCase;
 
 /**
- * @coversDefaultClass \WPEmerge\ServiceProviders\ExtendsConfigTrait
+ * @coversDefaultClass \WPEmerge\Application\Configuration
  */
 class ExtendsConfigTraitTest extends TestCase {
-	public function set_up() {
-		$this->subject = $this->getMockForTrait( ExtendsConfigTrait::class );
-	}
-
-	public function tear_down() {
-		unset( $this->subject );
-	}
-
 	/**
-	 * @covers ::extendConfig
-	 * @covers ::replaceConfig
+	 * @covers ::extend
 	 */
 	public function testExtendConfig_ConfigNotSet_Default() {
-		$container = new Container( [
-			WPEMERGE_CONFIG_KEY => [],
-		] );
+		$config = new Configuration( [] );
 		$key = 'foo';
 		$default = 'bar';
 		$expected = $default;
 
-		$this->subject->extendConfig( $container, $key, $default );
+		$config->extend( $key, $default );
 
-		$this->assertEquals( $expected, $container[ WPEMERGE_CONFIG_KEY ][ $key ] );
+		$this->assertEquals( $expected, $config->get( $key ) );
 	}
 
 	/**
-	 * @covers ::extendConfig
-	 * @covers ::replaceConfig
+	 * @covers ::extend
 	 */
 	public function testExtendConfig_NotArrays_Replace() {
-		$container = new Container( [
-			WPEMERGE_CONFIG_KEY => [
-				'foo' => 'foo',
-			],
+		$config = new Configuration( [
+			'foo' => 'foo',
 		] );
 		$key = 'foo';
 		$default = 'bar';
 		$expected = 'foo';
 
-		$this->subject->extendConfig( $container, $key, $default );
+		$config->extend( $key, $default );
 
-		$this->assertEquals( $expected, $container[ WPEMERGE_CONFIG_KEY ][ $key ] );
+		$this->assertEquals( $expected, $config->get( $key ) );
 	}
 
 	/**
-	 * @covers ::extendConfig
-	 * @covers ::replaceConfig
+	 * @covers ::extend
 	 */
 	public function testExtendConfig_Arrays_RecursiveReplace() {
-		$container = new Container( [
-			WPEMERGE_CONFIG_KEY => [
-				'foo' => [
+		$config = new Configuration( [
+			'foo' => [
+				'foo' => 'foo',
+				'bar' => 'bar',
+				'baz' => [
 					'foo' => 'foo',
-					'bar' => 'bar',
-					'baz' => [
-						'foo' => 'foo',
-					]
 				],
 			],
 		] );
@@ -79,43 +61,35 @@ class ExtendsConfigTraitTest extends TestCase {
 			'foobarbaz' => 'foobarbaz',
 		];
 		$expected = [
-			// Value is NOT missing.
 			'foo' => 'foo',
-			// Value is NOT replaced by default.
 			'bar' => 'bar',
 			'baz' => [
 				'foo' => 'foo',
-				// Key from default is added in nested array.
 				'bar' => 'bar',
 			],
-			// Key from default is added.
 			'foobarbaz' => 'foobarbaz',
 		];
 
-		$this->subject->extendConfig( $container, $key, $default );
+		$config->extend( $key, $default );
 
-		$this->assertEquals( $expected, $container[ WPEMERGE_CONFIG_KEY ][ $key ] );
+		$this->assertEquals( $expected, $config->get( $key ) );
 	}
 
 	/**
-	 * @covers ::extendConfig
-	 * @covers ::replaceConfig
+	 * @covers ::extend
 	 */
 	public function testExtendConfig_IndexedArray_Replace() {
-		$container = new Container( [
-			WPEMERGE_CONFIG_KEY => [
-				'first' => [
-					'bar',
-				],
-				'second' => [
-					'foobar' => [
-						'barfoo',
-						'barfoo',
-					]
-				],
-				'third' => [
+		$config = new Configuration( [
+			'first' => [
+				'bar',
+			],
+			'second' => [
+				'foobar' => [
+					'barfoo',
+					'barfoo',
 				],
 			],
+			'third' => [],
 		] );
 
 		$key = 'first';
@@ -127,9 +101,9 @@ class ExtendsConfigTraitTest extends TestCase {
 			'bar',
 		];
 
-		$this->subject->extendConfig( $container, $key, $default );
+		$config->extend( $key, $default );
 
-		$this->assertEquals( $expected, $container[ WPEMERGE_CONFIG_KEY ][ $key ] );
+		$this->assertEquals( $expected, $config->get( $key ) );
 
 		$key = 'second';
 		$default = [
@@ -144,8 +118,8 @@ class ExtendsConfigTraitTest extends TestCase {
 			],
 		];
 
-		$this->subject->extendConfig( $container, $key, $default );
+		$config->extend( $key, $default );
 
-		$this->assertEquals( $expected, $container[ WPEMERGE_CONFIG_KEY ][ $key ] );
+		$this->assertEquals( $expected, $config->get( $key ) );
 	}
 }

@@ -19,7 +19,7 @@ interface HasControllerMiddlewareInterface {
 	 * @param  string   $method
 	 * @return string[]
 	 */
-	public function getMiddleware( $method );
+	public function getMiddleware( string $method ): array;
 
 	/**
 	 * Add middleware.
@@ -27,7 +27,7 @@ interface HasControllerMiddlewareInterface {
 	 * @param  string|string[]      $middleware
 	 * @return ControllerMiddleware
 	 */
-	public function addMiddleware( $middleware );
+	public function addMiddleware( string|array $middleware ): ControllerMiddleware;
 
 	/**
 	 * Fluent alias for addMiddleware().
@@ -35,5 +35,5 @@ interface HasControllerMiddlewareInterface {
 	 * @param  string|string[]      $middleware
 	 * @return ControllerMiddleware
 	 */
-	public function middleware( $middleware );
+	public function middleware( string|array $middleware ): ControllerMiddleware;
 }

@@ -37,14 +37,14 @@ class PostTypeCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		return ( is_singular() && $this->post_type === get_post_type() );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['post_type' => $this->post_type];
 	}
 }

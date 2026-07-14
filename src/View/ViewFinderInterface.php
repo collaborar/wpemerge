@@ -19,7 +19,7 @@ interface ViewFinderInterface {
 	 * @param  string  $view
 	 * @return boolean
 	 */
-	public function exists( $view );
+	public function exists( string $view ): bool;
 
 	/**
 	 * Return a canonical string representation of the view name.
@@ -27,5 +27,5 @@ interface ViewFinderInterface {
 	 * @param  string $view
 	 * @return string
 	 */
-	public function canonical( $view );
+	public function canonical( string $view ): string;
 }

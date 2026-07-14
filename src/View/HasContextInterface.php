@@ -17,7 +17,7 @@ interface HasContextInterface {
 	 * @param  mixed|null  $default
 	 * @return mixed
 	 */
-	public function getContext( $key = null, $default = null );
+	public function getContext( ?string $key = null, mixed $default = null ): mixed;
 
 	/**
 	 * Add context values.
@@ -26,5 +26,5 @@ interface HasContextInterface {
 	 * @param  mixed                       $value
 	 * @return static                      $this
 	 */
-	public function with( $key, $value = null );
+	public function with( string|array $key, mixed $value = null ): static;
 }

@@ -21,7 +21,7 @@ interface ConditionInterface {
 	 * @param  RequestInterface $request
 	 * @return boolean
 	 */
-	public function isSatisfied( RequestInterface $request );
+	public function isSatisfied( RequestInterface $request ): bool;
 
 	/**
 	 * Get an array of arguments for use in request
@@ -29,5 +29,5 @@ interface ConditionInterface {
 	 * @param  RequestInterface $request
 	 * @return array
 	 */
-	public function getArguments( RequestInterface $request );
+	public function getArguments( RequestInterface $request ): array;
 }

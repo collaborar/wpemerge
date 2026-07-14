@@ -17,5 +17,5 @@ interface ResponsableInterface {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function toResponse();
+	public function toResponse(): ResponseInterface;
 }

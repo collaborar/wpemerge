@@ -9,74 +9,79 @@
 
 namespace WPEmerge\Kernels;
 
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use WPEmerge\Application\Application;
+use WPEmerge\Application\Configuration;
+use WPEmerge\Application\GenericFactory;
+use WPEmerge\Exceptions\ErrorHandlerInterface;
+use WPEmerge\Helpers\HandlerFactory;
+use WPEmerge\Requests\RequestInterface;
+use WPEmerge\Responses\ResponseService;
+use WPEmerge\Routing\Router;
 use WPEmerge\ServiceProviders\ExtendsConfigTrait;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use WPEmerge\View\ViewService;
 
 /**
- * Provide old input dependencies.
+ * Provide kernel dependencies.
  *
  * @codeCoverageIgnore
  */
-class KernelsServiceProvider implements ServiceProviderInterface {
+class KernelsServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 	use ExtendsConfigTrait;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$this->extendConfig( $container, 'middleware', [
-			'flash' => \WPEmerge\Flash\FlashMiddleware::class,
-			'old_input' => \WPEmerge\Input\OldInputMiddleware::class,
-			'csrf' => \WPEmerge\Csrf\CsrfMiddleware::class,
-			'user.logged_in' => \WPEmerge\Middleware\UserLoggedInMiddleware::class,
+	public function provides( string $id ): bool {
+		return $id === HttpKernelInterface::class;
+	}
+
+	public function boot(): void {
+		$this->extendConfig( 'middleware', [
+			'flash'        => \WPEmerge\Flash\FlashMiddleware::class,
+			'old_input'    => \WPEmerge\Input\OldInputMiddleware::class,
+			'csrf'         => \WPEmerge\Csrf\CsrfMiddleware::class,
+			'user.logged_in'  => \WPEmerge\Middleware\UserLoggedInMiddleware::class,
 			'user.logged_out' => \WPEmerge\Middleware\UserLoggedOutMiddleware::class,
-			'user.can' => \WPEmerge\Middleware\UserCanMiddleware::class,
+			'user.can'     => \WPEmerge\Middleware\UserCanMiddleware::class,
 		] );
 
-		$this->extendConfig( $container, 'middleware_groups', [
-			'wpemerge' => [
-				'flash',
-				'old_input',
-			],
-			'global' => [],
-			'web' => [],
-			'ajax' => [],
-			'admin' => [],
+		$this->extendConfig( 'middleware_groups', [
+			'wpemerge' => ['flash', 'old_input'],
+			'global'   => [],
+			'web'      => [],
+			'ajax'     => [],
+			'admin'    => [],
 		] );
 
-		$this->extendConfig( $container, 'middleware_priority', [] );
+		$this->extendConfig( 'middleware_priority', [] );
 
-		$container[ WPEMERGE_WORDPRESS_HTTP_KERNEL_KEY ] = function ( $c ) {
-			$kernel = new HttpKernel(
-				$c,
-				$c[ WPEMERGE_APPLICATION_GENERIC_FACTORY_KEY ],
-				$c[ WPEMERGE_HELPERS_HANDLER_FACTORY_KEY ],
-				$c[ WPEMERGE_RESPONSE_SERVICE_KEY ],
-				$c[ WPEMERGE_REQUEST_KEY ],
-				$c[ WPEMERGE_ROUTING_ROUTER_KEY ],
-				$c[ WPEMERGE_VIEW_SERVICE_KEY ],
-				$c[ WPEMERGE_EXCEPTIONS_ERROR_HANDLER_KEY ]
-			);
-
-			$kernel->setMiddleware( $c[ WPEMERGE_CONFIG_KEY ]['middleware'] );
-			$kernel->setMiddlewareGroups( $c[ WPEMERGE_CONFIG_KEY ]['middleware_groups'] );
-			$kernel->setMiddlewarePriority( $c[ WPEMERGE_CONFIG_KEY ]['middleware_priority'] );
-
-			return $kernel;
-		};
-
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-
+		$app = $this->getContainer()->get( Application::class );
 		$app->alias( 'run', function () use ( $app ) {
-			$kernel = $app->resolve( WPEMERGE_WORDPRESS_HTTP_KERNEL_KEY );
+			$kernel = $app->resolve( HttpKernelInterface::class );
 			return call_user_func_array( [$kernel, 'run'], func_get_args() );
 		} );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function register(): void {
+		$this->getContainer()->addShared( HttpKernelInterface::class, function () {
+			$c = $this->getContainer();
+			$config = $c->get( Configuration::class );
+
+			$kernel = new HttpKernel(
+				$c->get( Application::class ),
+				$c->get( GenericFactory::class ),
+				$c->get( HandlerFactory::class ),
+				$c->get( ResponseService::class ),
+				$c->get( RequestInterface::class ),
+				$c->get( Router::class ),
+				$c->get( ViewService::class ),
+				$c->get( ErrorHandlerInterface::class )
+			);
+
+			$kernel->setMiddleware( $config->get( 'middleware', [] ) );
+			$kernel->setMiddlewareGroups( $config->get( 'middleware_groups', [] ) );
+			$kernel->setMiddlewarePriority( $config->get( 'middleware_priority', [] ) );
+
+			return $kernel;
+		} );
 	}
 }

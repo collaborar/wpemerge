@@ -3,10 +3,13 @@
 namespace WPEmergeTests\Application;
 
 use Exception;
+use League\Container\Container;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
 use Mockery;
-use Pimple\Container;
+use stdClass;
 use WPEmerge\Application\Application;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use WPEmerge\Kernels\HttpKernelInterface;
 use WPEmergeTestTools\TestCase;
 
 /**
@@ -20,7 +23,6 @@ class ApplicationTest extends TestCase {
 	public function set_up() {
 		$this->container = new Container();
 		$this->subject = new Application( $this->container, false );
-		$this->container[ WPEMERGE_APPLICATION_KEY ] = $this->subject;
 	}
 
 	public function tear_down() {
@@ -61,15 +63,16 @@ class ApplicationTest extends TestCase {
 
 	/**
 	 * @covers ::bootstrap
-	 * @covers ::registerServiceProviders
-	 * @covers ::bootstrapServiceProviders
+	 * @covers ::loadServiceProviders
 	 */
 	public function testBootstrap_RegisterServiceProviders() {
 		$this->subject->bootstrap( [
 			'providers' => [
 				ApplicationTestServiceProviderMock::class,
-			]
+			],
 		], false );
+
+		$this->subject->resolve( 'test.service' );
 
 		$this->assertTrue( true );
 	}
@@ -105,45 +108,49 @@ class ApplicationTest extends TestCase {
 		$expected = 'foobar';
 		$container_key = 'test';
 
-		$container = $this->subject->container();
-		$container[ $container_key ] = $expected;
-
 		$this->subject->bootstrap( [], false );
+		$this->subject->container()->addShared( $container_key, fn () => $expected );
+
 		$this->assertSame( $expected, $this->subject->resolve( $container_key ) );
 	}
 }
 
 #[\AllowDynamicProperties]
-class ApplicationTestServiceProviderMock implements ServiceProviderInterface {
+class ApplicationTestServiceProviderMock extends AbstractServiceProvider implements BootableServiceProviderInterface {
 	public function __construct() {
-		$this->mock = Mockery::mock( ServiceProviderInterface::class );
+		$this->mock = Mockery::mock();
+		$this->mock->shouldReceive( 'boot' )
+			->once();
 		$this->mock->shouldReceive( 'register' )
 			->once();
-		$this->mock->shouldReceive( 'bootstrap' )
-			->once();
 	}
 
-	public function register( $container ) {
-		call_user_func_array( [$this->mock, 'register'], func_get_args() );
+	public function provides( string $id ): bool {
+		return $id === 'test.service';
 	}
 
-	public function bootstrap( $container ) {
-		call_user_func_array( [$this->mock, 'bootstrap'], func_get_args() );
+	public function boot(): void {
+		$this->mock->boot();
+	}
+
+	public function register(): void {
+		$this->mock->register();
+		$this->getContainer()->addShared( 'test.service', fn () => new stdClass() );
 	}
 }
 
 #[\AllowDynamicProperties]
-class ApplicationTestKernelServiceProviderMock implements ServiceProviderInterface {
-	public function register( $container ) {
-		$mock = Mockery::mock();
+class ApplicationTestKernelServiceProviderMock extends AbstractServiceProvider {
+	public function provides( string $id ): bool {
+		return $id === HttpKernelInterface::class;
+	}
+
+	public function register(): void {
+		$mock = Mockery::mock( HttpKernelInterface::class );
 
 		$mock->shouldReceive( 'bootstrap' )
 			->once();
 
-		$container[ WPEMERGE_WORDPRESS_HTTP_KERNEL_KEY ] = $mock;
-	}
-
-	public function bootstrap( $container ) {
-		// Do nothing.
+		$this->getContainer()->addShared( HttpKernelInterface::class, fn () => $mock );
 	}
 }

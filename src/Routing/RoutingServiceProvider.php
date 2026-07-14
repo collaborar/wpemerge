@@ -9,17 +9,21 @@
 
 namespace WPEmerge\Routing;
 
-use Pimple\Container;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use WPEmerge\Application\Application;
+use WPEmerge\Application\Configuration;
+use WPEmerge\Helpers\HandlerFactory;
 use WPEmerge\Routing\Conditions\ConditionFactory;
 use WPEmerge\ServiceProviders\ExtendsConfigTrait;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use WPEmerge\View\ViewService;
 
 /**
  * Provide routing dependencies
  *
  * @codeCoverageIgnore
  */
-class RoutingServiceProvider implements ServiceProviderInterface {
+class RoutingServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 	use ExtendsConfigTrait;
 
 	/**
@@ -27,80 +31,79 @@ class RoutingServiceProvider implements ServiceProviderInterface {
 	 *
 	 * @var array<string, string>
 	 */
-	protected static $condition_types = [
-		'url' => Conditions\UrlCondition::class,
-		'custom' => Conditions\CustomCondition::class,
-		'multiple' => Conditions\MultipleCondition::class,
-		'negate' => Conditions\NegateCondition::class,
-		'post_id' => Conditions\PostIdCondition::class,
-		'post_slug' => Conditions\PostSlugCondition::class,
-		'post_status' => Conditions\PostStatusCondition::class,
+	protected static array $condition_types = [
+		'url'           => Conditions\UrlCondition::class,
+		'custom'        => Conditions\CustomCondition::class,
+		'multiple'      => Conditions\MultipleCondition::class,
+		'negate'        => Conditions\NegateCondition::class,
+		'post_id'       => Conditions\PostIdCondition::class,
+		'post_slug'     => Conditions\PostSlugCondition::class,
+		'post_status'   => Conditions\PostStatusCondition::class,
 		'post_template' => Conditions\PostTemplateCondition::class,
-		'post_type' => Conditions\PostTypeCondition::class,
-		'query_var' => Conditions\QueryVarCondition::class,
-		'ajax' => Conditions\AjaxCondition::class,
-		'admin' => Conditions\AdminCondition::class,
+		'post_type'     => Conditions\PostTypeCondition::class,
+		'query_var'     => Conditions\QueryVarCondition::class,
+		'ajax'          => Conditions\AjaxCondition::class,
+		'admin'         => Conditions\AdminCondition::class,
 	];
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$namespace = $container[ WPEMERGE_CONFIG_KEY ]['namespace'];
+	public function provides( string $id ): bool {
+		return in_array( $id, [
+			Router::class,
+			ConditionFactory::class,
+			RouteBlueprint::class,
+		], true );
+	}
 
-		$this->extendConfig( $container, 'routes', [
-			'web' => [
+	public function boot(): void {
+		$config    = $this->getContainer()->get( Configuration::class );
+		$namespace = $config->get( 'namespace', 'App\\' );
+
+		$this->extendConfig( 'routes', [
+			'web'   => [
 				'definitions' => '',
 				'attributes'  => [
 					'middleware' => ['web'],
-					'namespace' => $namespace . 'Controllers\\Web\\',
-					'handler' => 'WPEmerge\\Controllers\\WordPressController@handle',
+					'namespace'  => $namespace . 'Controllers\\Web\\',
+					'handler'    => 'WPEmerge\\Controllers\\WordPressController@handle',
 				],
 			],
 			'admin' => [
 				'definitions' => '',
 				'attributes'  => [
 					'middleware' => ['admin'],
-					'namespace' => $namespace . 'Controllers\\Admin\\',
+					'namespace'  => $namespace . 'Controllers\\Admin\\',
 				],
 			],
-			'ajax' => [
+			'ajax'  => [
 				'definitions' => '',
 				'attributes'  => [
 					'middleware' => ['ajax'],
-					'namespace' => $namespace . 'Controllers\\Ajax\\',
+					'namespace'  => $namespace . 'Controllers\\Ajax\\',
 				],
 			],
 		] );
 
-		/** @var Container $container */
-		$container[ WPEMERGE_ROUTING_CONDITION_TYPES_KEY ] = static::$condition_types;
-
-		$container[ WPEMERGE_ROUTING_ROUTER_KEY ] = function ( $c ) {
-			return new Router(
-				$c[ WPEMERGE_ROUTING_CONDITIONS_CONDITION_FACTORY_KEY ],
-				$c[ WPEMERGE_HELPERS_HANDLER_FACTORY_KEY ]
-			);
-		};
-
-		$container[ WPEMERGE_ROUTING_CONDITIONS_CONDITION_FACTORY_KEY ] = function ( $c ) {
-			return new ConditionFactory( $c[ WPEMERGE_ROUTING_CONDITION_TYPES_KEY ] );
-		};
-
-		$container[ WPEMERGE_ROUTING_ROUTE_BLUEPRINT_KEY ] = $container->factory( function ( $c ) {
-			return new RouteBlueprint( $c[ WPEMERGE_ROUTING_ROUTER_KEY ], $c[ WPEMERGE_VIEW_SERVICE_KEY ] );
-		} );
-
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-		$app->alias( 'router', WPEMERGE_ROUTING_ROUTER_KEY );
-		$app->alias( 'route', WPEMERGE_ROUTING_ROUTE_BLUEPRINT_KEY );
-		$app->alias( 'routeUrl', WPEMERGE_ROUTING_ROUTER_KEY, 'getRouteUrl' );
+		$app = $this->getContainer()->get( Application::class );
+		$app->alias( 'router', Router::class );
+		$app->alias( 'route', RouteBlueprint::class );
+		$app->alias( 'routeUrl', Router::class, 'getRouteUrl' );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function register(): void {
+		$c = $this->getContainer();
+
+		$c->addShared( ConditionFactory::class, function () use ( $c ) {
+			$conditionTypes = array_merge(
+				static::$condition_types,
+				$c->get( Configuration::class )->get( 'condition_types', [] )
+			);
+			return new ConditionFactory( $conditionTypes );
+		} );
+
+		// Router and RouteBlueprint need explicit constructor arguments; League definitions do not autowire.
+		$c->addShared( Router::class )->addArguments( [ ConditionFactory::class, HandlerFactory::class ] );
+
+		// RouteBlueprint is a factory: new instance per resolve (like the old $container->factory())
+		$c->add( RouteBlueprint::class )->addArguments( [ Router::class, ViewService::class ] );
 	}
 }

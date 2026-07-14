@@ -6,8 +6,8 @@ use Closure;
 use Exception;
 use GuzzleHttp\Psr7;
 use Mockery;
-use Pimple\Container;
 use Psr\Http\Message\ResponseInterface;
+use ReflectionProperty;
 use WPEmerge\Application\Application;
 use WPEmerge\Application\GenericFactory;
 use WPEmerge\Exceptions\ErrorHandlerInterface;
@@ -28,7 +28,7 @@ use WPEmergeTestTools\TestCase;
  */
 class HttpKernelTest extends TestCase {
 	public function set_up() {
-		$this->container = Mockery::mock( Container::class );
+		$this->application = Mockery::mock( Application::class );
 		$this->factory = Mockery::mock( GenericFactory::class )->shouldIgnoreMissing();
 		$this->handler_factory = Mockery::mock( HandlerFactory::class )->shouldIgnoreMissing();
 		$this->request = Mockery::mock( RequestInterface::class );
@@ -38,24 +38,32 @@ class HttpKernelTest extends TestCase {
 		$this->error_handler = Mockery::mock( ErrorHandlerInterface::class )->shouldIgnoreMissing();
 		$this->factory_handler = Mockery::mock( Handler::class );
 
-		$app = Mockery::mock( Application::class );
-		$this->container->shouldReceive( 'offsetGet' )
-			->with( WPEMERGE_APPLICATION_KEY )
-			->andReturn( $app );
-
-		$app->shouldReceive( 'renderConfigExceptions' )
+		$this->application->shouldReceive( 'renderConfigExceptions' )
 			->andReturnUsing( function ( $action ) { return $action(); } );
 
 		$this->handler_factory->shouldReceive( 'make' )
 			->andReturn( $this->factory_handler );
 
-		$this->subject = new HttpKernel( $this->container, $this->factory, $this->handler_factory, $this->response_service, $this->request, $this->router, $this->view_service, $this->error_handler );
+		$this->subject = new HttpKernel( $this->application, $this->factory, $this->handler_factory, $this->response_service, $this->request, $this->router, $this->view_service, $this->error_handler );
+	}
+
+	/**
+	 * Set the kernel response property for testing.
+	 *
+	 * @param HttpKernel         $subject
+	 * @param ResponseInterface|null $response
+	 * @return void
+	 */
+	protected function setKernelResponse( HttpKernel $subject, $response ): void {
+		$property = new ReflectionProperty( HttpKernel::class, 'response' );
+		$property->setAccessible( true );
+		$property->setValue( $subject, $response );
 	}
 
 	public function tear_down() {
 		Mockery::close();
 
-		unset( $this->container );
+		unset( $this->application );
 		unset( $this->factory );
 		unset( $this->handler_factory );
 		unset( $this->request );
@@ -94,7 +102,7 @@ class HttpKernelTest extends TestCase {
 		};
 		$error_handler = Mockery::mock( ErrorHandlerInterface::class )->shouldIgnoreMissing();
 		$subject = new HttpKernel(
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,
@@ -198,7 +206,7 @@ class HttpKernelTest extends TestCase {
 		$arguments = ['foo', 'bar'];
 		$route_arguments = ['baz'];
 		$subject = Mockery::mock( HttpKernel::class, [
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,
@@ -207,8 +215,6 @@ class HttpKernelTest extends TestCase {
 			$this->view_service,
 			$this->error_handler
 		] )->makePartial();
-
-		$this->container->shouldReceive( 'offsetSet' );
 
 		$this->router->shouldReceive( 'execute' )
 			->andReturn( $route );
@@ -251,13 +257,7 @@ class HttpKernelTest extends TestCase {
 	public function testRespond_Response_Respond() {
 		$response = Mockery::mock( ResponseInterface::class );
 
-		$this->container->shouldReceive( 'offsetExists' )
-			->with( WPEMERGE_RESPONSE_KEY )
-			->andReturn( true );
-
-		$this->container->shouldReceive( 'offsetGet' )
-			->with( WPEMERGE_RESPONSE_KEY )
-			->andReturn( $response );
+		$this->setKernelResponse( $this->subject, $response );
 
 		$this->response_service->shouldReceive( 'respond' )
 			->with( $response )
@@ -272,9 +272,7 @@ class HttpKernelTest extends TestCase {
 	 * @covers ::respond
 	 */
 	public function testRespond_NoResponse_DoNotRespond() {
-		$this->container->shouldReceive( 'offsetExists' )
-			->with( WPEMERGE_RESPONSE_KEY )
-			->andReturn( false );
+		$this->setKernelResponse( $this->subject, null );
 
 		$this->response_service->shouldNotReceive( 'respond' );
 
@@ -290,7 +288,7 @@ class HttpKernelTest extends TestCase {
 		$expected = 'composed view output';
 		$view = Mockery::mock( ViewInterface::class );
 		$subject = Mockery::mock( HttpKernel::class, [
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,
@@ -382,7 +380,7 @@ class HttpKernelTest extends TestCase {
 	public function testFilterTemplateInclude_Response_Override() {
 		$response = Mockery::mock( ResponseInterface::class )->shouldIgnoreMissing();
 		$subject = Mockery::mock( HttpKernel::class, [
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,
@@ -395,9 +393,6 @@ class HttpKernelTest extends TestCase {
 		$subject->shouldReceive( 'handle' )
 			->andReturn( $response );
 
-		$this->container->shouldReceive( 'offsetSet' )
-			->with( WPEMERGE_RESPONSE_KEY, $response );
-
 		$this->assertEquals( WPEMERGE_DIR . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'view.php', $subject->filterTemplateInclude( '' ) );
 	}
 
@@ -409,7 +404,7 @@ class HttpKernelTest extends TestCase {
 
 		$response = Mockery::mock( ResponseInterface::class );
 		$subject = Mockery::mock( HttpKernel::class, [
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,
@@ -425,9 +420,6 @@ class HttpKernelTest extends TestCase {
 		$subject->shouldReceive( 'handle' )
 			->andReturn( $response );
 
-		$this->container->shouldReceive( 'offsetSet' )
-			->with( WPEMERGE_RESPONSE_KEY, $response );
-
 		$this->assertFalse( $wp_query->is_404() );
 		$subject->filterTemplateInclude( '' );
 		$this->assertTrue( $wp_query->is_404() );
@@ -440,7 +432,7 @@ class HttpKernelTest extends TestCase {
 		$template = 'index.php';
 		$composer = function () {};
 		$subject = Mockery::mock( HttpKernel::class, [
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,
@@ -465,7 +457,7 @@ class HttpKernelTest extends TestCase {
 	 */
 	public function testFilterTemplateInclude_NoResponseNoComposers_Passthrough() {
 		$subject = Mockery::mock( HttpKernel::class, [
-			$this->container,
+			$this->application,
 			$this->factory,
 			$this->handler_factory,
 			$this->response_service,

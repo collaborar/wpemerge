@@ -31,7 +31,7 @@ trait HasQueryFilterTrait {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	abstract public function getAttribute( $attribute, $default = '' );
+	abstract public function getAttribute( string $attribute, mixed $default = '' ): mixed;
 
 	/**
 	 * Apply the query filter, if any.
@@ -40,7 +40,7 @@ trait HasQueryFilterTrait {
 	 * @param  array            $query_vars
 	 * @return array
 	 */
-	public function applyQueryFilter( $request, $query_vars ) {
+	public function applyQueryFilter( RequestInterface $request, array $query_vars ): array {
 		$query = $this->getAttribute( 'query' );
 		$condition = $this->getAttribute( 'condition' );
 

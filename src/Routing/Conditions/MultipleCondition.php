@@ -45,7 +45,7 @@ class MultipleCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		foreach ( $this->conditions as $condition ) {
 			if ( ! $condition->isSatisfied( $request ) ) {
 				return false;
@@ -57,7 +57,7 @@ class MultipleCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		$arguments = [];
 
 		foreach ( $this->conditions as $condition ) {

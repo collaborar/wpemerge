@@ -103,7 +103,7 @@ class ExecutesMiddlewareTraitImplementation {
 		$this->factory = $factory;
 	}
 
-	protected function makeMiddleware( $class ): object {
+	protected function makeMiddleware( string $class ): object {
 		return $this->factory->make( $class );
 	}
 

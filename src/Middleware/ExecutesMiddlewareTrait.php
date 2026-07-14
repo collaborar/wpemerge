@@ -23,7 +23,7 @@ trait ExecutesMiddlewareTrait {
 	 * @param  string $class
 	 * @return object
 	 */
-	abstract protected function makeMiddleware( $class );
+	abstract protected function makeMiddleware( string $class ): object;
 
 	/**
 	 * Execute an array of middleware recursively (last in, first out).

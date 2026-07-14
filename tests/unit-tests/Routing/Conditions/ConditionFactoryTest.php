@@ -4,7 +4,7 @@ namespace WPEmergeTests\Routing\Conditions;
 
 use Exception;
 use Mockery;
-use Pimple\Container;
+use League\Container\Container;
 use stdClass;
 use WPEmerge\Application\Application;
 use WPEmerge\Exceptions\ConfigurationException;
@@ -29,10 +29,9 @@ class ConditionFactoryTest extends TestCase {
 	public function set_up() {
 		$app = new Application( new Container(), false );
 		$app->bootstrap( [], false );
-		$condition_types = $app->resolve( WPEMERGE_ROUTING_CONDITION_TYPES_KEY );
 
 		$this->request = Mockery::mock( RequestInterface::class );
-		$this->subject = new ConditionFactory( $condition_types );
+		$this->subject = $app->resolve( ConditionFactory::class );
 	}
 
 	public function tear_down() {

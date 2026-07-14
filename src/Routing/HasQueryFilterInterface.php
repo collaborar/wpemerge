@@ -22,5 +22,5 @@ interface HasQueryFilterInterface {
 	 * @param  array            $query_vars
 	 * @return array
 	 */
-	public function applyQueryFilter( $request, $query_vars );
+	public function applyQueryFilter( RequestInterface $request, array $query_vars ): array;
 }

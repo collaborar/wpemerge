@@ -56,14 +56,14 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function exists( $view ) {
+	public function exists( string $view ): bool {
 		return ! empty( $this->resolveFilepath( $view ) );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function canonical( $view ) {
+	public function canonical( string $view ): string {
 		return $this->resolveFilepath( $view );
 	}
 

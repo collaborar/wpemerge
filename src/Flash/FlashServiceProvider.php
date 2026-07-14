@@ -9,40 +9,40 @@
 
 namespace WPEmerge\Flash;
 
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use WPEmerge\Application\Application;
 
 /**
  * Provide flash dependencies.
  *
  * @codeCoverageIgnore
  */
-class FlashServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ WPEMERGE_FLASH_KEY ] = function ( $c ) {
-			$session = null;
-			if ( isset( $c[ WPEMERGE_SESSION_KEY ] ) ) {
-				$session = &$c[ WPEMERGE_SESSION_KEY ];
-			} else if ( isset( $_SESSION ) ) {
-				$session = &$_SESSION;
-			}
-			return new Flash( $session );
-		};
+class FlashServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-		$container[ FlashMiddleware::class ] = function ( $c ) {
-			return new FlashMiddleware( $c[ WPEMERGE_FLASH_KEY ] );
-		};
-
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-		$app->alias( 'flash', WPEMERGE_FLASH_KEY );
+	public function provides(string $id): bool {
+		return in_array($id, [Flash::class, FlashMiddleware::class], true);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function boot(): void {
+		$app = $this->getContainer()->get(Application::class);
+		$app->alias('flash', Flash::class);
+	}
+
+	public function register(): void {
+		$c = $this->getContainer();
+
+		$c->addShared(Flash::class, function () use ($c) {
+			if ($c->has(WPEMERGE_SESSION_KEY)) {
+				$session = $c->get(WPEMERGE_SESSION_KEY);
+			} elseif (isset($_SESSION)) {
+				$session = &$_SESSION;
+			} else {
+				$session = null;
+			}
+			return new Flash($session);
+		});
+
+		$c->addShared( FlashMiddleware::class )->addArguments( [ Flash::class ] );
 	}
 }

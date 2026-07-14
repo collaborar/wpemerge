@@ -9,26 +9,26 @@
 
 namespace WPEmerge\Application;
 
-use Pimple\Container;
+use League\Container\Container;
 
 /**
- * Holds an IoC container.
+ * Holds a League Container instance.
  */
 trait HasContainerTrait {
 	/**
 	 * IoC container.
 	 *
-	 * @var Container
+	 * @var Container|null
 	 */
-	protected $container = null;
+	protected ?Container $container = null;
 
 	/**
 	 * Get the IoC container instance.
 	 *
 	 * @codeCoverageIgnore
-	 * @return Container
+	 * @return Container|null
 	 */
-	public function container() {
+	public function container(): ?Container {
 		return $this->container;
 	}
 
@@ -39,7 +39,7 @@ trait HasContainerTrait {
 	 * @param  Container $container
 	 * @return void
 	 */
-	public function setContainer( $container ) {
+	public function setContainer( Container $container ): void {
 		$this->container = $container;
 	}
 
@@ -49,11 +49,11 @@ trait HasContainerTrait {
 	 * @param  string     $key
 	 * @return mixed|null
 	 */
-	public function resolve( $key ) {
-		if ( ! isset( $this->container()[ $key ] ) ) {
+	public function resolve( string $key ): mixed {
+		if ( ! $this->container()->has( $key ) ) {
 			return null;
 		}
 
-		return $this->container()[ $key ];
+		return $this->container()->get( $key );
 	}
 }

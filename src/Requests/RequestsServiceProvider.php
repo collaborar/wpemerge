@@ -9,27 +9,20 @@
 
 namespace WPEmerge\Requests;
 
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
 
 /**
  * Provide request dependencies.
  *
  * @codeCoverageIgnore
  */
-class RequestsServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ WPEMERGE_REQUEST_KEY ] = function () {
-			return Request::fromGlobals();
-		};
+class RequestsServiceProvider extends AbstractServiceProvider {
+
+	public function provides( string $id ): bool {
+		return $id === RequestInterface::class;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function register(): void {
+		$this->getContainer()->addShared( RequestInterface::class, fn () => Request::fromGlobals() );
 	}
 }

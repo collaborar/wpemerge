@@ -29,7 +29,7 @@ trait HasAttributesTrait {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function getAttribute( $attribute, $default = '' ) {
+	public function getAttribute( string $attribute, mixed $default = '' ): mixed {
 		return Arr::get( $this->getAttributes(), $attribute, $default );
 	}
 
@@ -38,7 +38,7 @@ trait HasAttributesTrait {
 	 *
 	 * @return array<string, mixed>
 	 */
-	public function getAttributes() {
+	public function getAttributes(): array {
 		return $this->attributes;
 	}
 
@@ -49,7 +49,7 @@ trait HasAttributesTrait {
 	 * @param  mixed  $value
 	 * @return void
 	 */
-	public function setAttribute( $attribute, $value ) {
+	public function setAttribute( string $attribute, mixed $value ): void {
 		$this->setAttributes( array_merge(
 			$this->getAttributes(),
 			[$attribute => $value]
@@ -64,7 +64,7 @@ trait HasAttributesTrait {
 	 * @param  mixed  $value
 	 * @return static $this
 	 */
-	public function attribute( $attribute, $value ) {
+	public function attribute( string $attribute, mixed $value ): static {
 		$this->setAttribute( $attribute, $value );
 
 		return $this;
@@ -77,7 +77,7 @@ trait HasAttributesTrait {
 	 * @param  array<string, mixed> $attributes
 	 * @return void
 	 */
-	public function setAttributes( $attributes ) {
+	public function setAttributes( array $attributes ): void {
 		$this->attributes = $attributes;
 	}
 
@@ -88,7 +88,7 @@ trait HasAttributesTrait {
 	 * @param  array<string, mixed> $attributes
 	 * @return static               $this
 	 */
-	public function attributes( $attributes ) {
+	public function attributes( array $attributes ): static {
 		$this->setAttributes( $attributes );
 
 		return $this;

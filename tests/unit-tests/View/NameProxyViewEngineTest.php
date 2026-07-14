@@ -2,10 +2,11 @@
 
 namespace WPEmergeTests\View;
 
+use League\Container\Container;
 use Mockery;
-use Pimple\Container;
 use WPEmerge\Application\Application;
 use WPEmerge\View\NameProxyViewEngine;
+use WPEmerge\View\PhpViewEngine;
 use WPEmerge\View\ViewNotFoundException;
 use WPEmergeTestTools\TestCase;
 
@@ -24,7 +25,6 @@ class NameProxyViewEngineTest extends TestCase {
 	}
 
 	public function tear_down() {
-		unset( $this->container['engine_mockup'] );
 		unset( $this->container );
 		unset( $this->app );
 	}
@@ -60,7 +60,7 @@ class NameProxyViewEngineTest extends TestCase {
 	public function testConstruct_EmptyDefault_Ignored() {
 		$subject = new NameProxyViewEngine( $this->app, [], '' );
 
-		$this->assertNotEquals( '', $subject->getDefaultBinding() );
+		$this->assertEquals( PhpViewEngine::class, $subject->getDefaultBinding() );
 	}
 
 	/**
@@ -86,7 +86,7 @@ class NameProxyViewEngineTest extends TestCase {
 	 */
 	public function testExists() {
 		$view = 'foo';
-		$this->container['engine_mockup'] = function() use ( $view ) {
+		$this->container->addShared( 'engine_mockup', function () use ( $view ) {
 			$mock = Mockery::mock();
 
 			$mock->shouldReceive( 'exists' )
@@ -95,7 +95,7 @@ class NameProxyViewEngineTest extends TestCase {
 				->ordered();
 
 			return $mock;
-		};
+		} );
 
 		$subject = new NameProxyViewEngine( $this->app, [], 'engine_mockup' );
 
@@ -109,7 +109,7 @@ class NameProxyViewEngineTest extends TestCase {
 		$view = 'foo';
 		$expected = 'foo.php';
 
-		$this->container['engine_mockup'] = function() use ( $view, $expected ) {
+		$this->container->addShared( 'engine_mockup', function () use ( $view, $expected ) {
 			$mock = Mockery::mock();
 
 			$mock->shouldReceive( 'canonical' )
@@ -118,7 +118,7 @@ class NameProxyViewEngineTest extends TestCase {
 				->ordered();
 
 			return $mock;
-		};
+		} );
 
 		$subject = new NameProxyViewEngine( $this->app, [], 'engine_mockup' );
 
@@ -132,7 +132,7 @@ class NameProxyViewEngineTest extends TestCase {
 		$view = 'file.php';
 		$result = 'foobar';
 
-		$this->container['engine_mockup'] = function() use ( $view, $result ) {
+		$this->container->addShared( 'engine_mockup', function () use ( $view, $result ) {
 			$mock = Mockery::mock();
 
 			$mock->shouldReceive( 'exists' )
@@ -144,7 +144,7 @@ class NameProxyViewEngineTest extends TestCase {
 				->andReturn( $result );
 
 			return $mock;
-		};
+		} );
 
 		$subject = new NameProxyViewEngine( $this->app, [], 'engine_mockup' );
 
@@ -157,7 +157,7 @@ class NameProxyViewEngineTest extends TestCase {
 	public function testMake_NoView_EmptyString() {
 		$view = '';
 
-		$this->container['engine_mockup'] = function() use ( $view ) {
+		$this->container->addShared( 'engine_mockup', function () use ( $view ) {
 			$mock = Mockery::mock();
 
 			$mock->shouldReceive( 'exists' )
@@ -165,7 +165,7 @@ class NameProxyViewEngineTest extends TestCase {
 				->andReturn( false );
 
 			return $mock;
-		};
+		} );
 
 		$subject = new NameProxyViewEngine( $this->app, [], 'engine_mockup' );
 

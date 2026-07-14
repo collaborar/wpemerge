@@ -120,5 +120,5 @@ trait HasAliasesTrait {
 	 * @param  string     $key
 	 * @return mixed|null
 	 */
-	abstract public function resolve( $key );
+	abstract public function resolve( string $key ): mixed;
 }

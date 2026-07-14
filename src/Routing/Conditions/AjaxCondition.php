@@ -83,7 +83,7 @@ class AjaxCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		if ( ! wp_doing_ajax() ) {
 			return false;
 		}
@@ -98,14 +98,14 @@ class AjaxCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['action' => $this->action];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function toUrl( $arguments = [] ) {
+	public function toUrl( array $arguments = [] ): string {
 		return add_query_arg( 'action', $this->action, self_admin_url( 'admin-ajax.php' ) );
 	}
 }

@@ -10,9 +10,13 @@
 namespace WPEmerge\Application;
 
 use Closure;
-use Pimple\Container;
+use League\Container\Container;
+use League\Container\ReflectionContainer;
+use Psr\Container\ContainerInterface;
 use WPEmerge\Exceptions\ConfigurationException;
+use WPEmerge\Kernels\HttpKernelInterface;
 use WPEmerge\Requests\Request;
+use WPEmerge\Responses\ResponseService;
 use WPEmerge\Support\Arr;
 
 /**
@@ -26,16 +30,16 @@ class Application {
 	/**
 	 * Flag whether to intercept and render configuration exceptions.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
-	protected $render_config_exceptions = true;
+	protected bool $render_config_exceptions = true;
 
 	/**
 	 * Flag whether the application has been bootstrapped.
 	 *
-	 * @var boolean
+	 * @var bool
 	 */
-	protected $bootstrapped = false;
+	protected bool $bootstrapped = false;
 
 	/**
 	 * Make a new application instance.
@@ -43,7 +47,7 @@ class Application {
 	 * @codeCoverageIgnore
 	 * @return static
 	 */
-	public static function make() {
+	public static function make(): static {
 		return new static( new Container() );
 	}
 
@@ -51,31 +55,38 @@ class Application {
 	 * Constructor.
 	 *
 	 * @param Container $container
-	 * @param boolean   $render_config_exceptions
+	 * @param bool      $render_config_exceptions
 	 */
-	public function __construct( Container $container, $render_config_exceptions = true ) {
+	public function __construct( Container $container, bool $render_config_exceptions = true ) {
 		$this->setContainer( $container );
-		$this->container()[ WPEMERGE_APPLICATION_KEY ] = $this;
 		$this->render_config_exceptions = $render_config_exceptions;
+
+		// Enable auto-wiring via ReflectionContainer (cache reflections for performance).
+		$container->delegate( new ReflectionContainer( true ) );
+
+		// Self-register so the container can resolve the application and ContainerInterface.
+		$container->addShared( static::class, fn () => $this );
+		$container->addShared( Application::class, fn () => $this );
+		$container->addShared( ContainerInterface::class, fn () => $container );
 	}
 
 	/**
 	 * Get whether the application has been bootstrapped.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
-	public function isBootstrapped() {
+	public function isBootstrapped(): bool {
 		return $this->bootstrapped;
 	}
 
 	/**
 	 * Bootstrap the application.
 	 *
-	 * @param  array   $config
-	 * @param  boolean $run
+	 * @param  array $config
+	 * @param  bool  $run
 	 * @return void
 	 */
-	public function bootstrap( $config = [], $run = true ) {
+	public function bootstrap( array $config = [], bool $run = true ): void {
 		if ( $this->isBootstrapped() ) {
 			throw new ConfigurationException( static::class . ' already bootstrapped.' );
 		}
@@ -90,22 +101,23 @@ class Application {
 			$this->loadRoutes();
 
 			if ( $run ) {
-				$kernel = $this->resolve( WPEMERGE_WORDPRESS_HTTP_KERNEL_KEY );
+				$kernel = $this->resolve( HttpKernelInterface::class );
 				$kernel->bootstrap();
 			}
 		} );
 	}
 
 	/**
-	 * Load config into the service container.
+	 * Register the Configuration singleton in the container.
 	 *
 	 * @codeCoverageIgnore
 	 * @param  Container $container
 	 * @param  array     $config
 	 * @return void
 	 */
-	protected function loadConfig( Container $container, $config ) {
-		$container[ WPEMERGE_CONFIG_KEY ] = $config;
+	protected function loadConfig( Container $container, array $config ): void {
+		$configuration = new Configuration( $config );
+		$container->addShared( Configuration::class, fn () => $configuration );
 	}
 
 	/**
@@ -114,7 +126,7 @@ class Application {
 	 * @codeCoverageIgnore
 	 * @return void
 	 */
-	protected function loadRoutes() {
+	protected function loadRoutes(): void {
 		if ( wp_doing_ajax() ) {
 			$this->loadRoutesGroup( 'ajax' );
 			return;
@@ -135,10 +147,10 @@ class Application {
 	 * @param  string $group
 	 * @return void
 	 */
-	protected function loadRoutesGroup( $group ) {
-		$config = $this->resolve( WPEMERGE_CONFIG_KEY );
-		$file = Arr::get( $config, 'routes.' . $group . '.definitions', '' );
-		$attributes = Arr::get( $config, 'routes.' . $group . '.attributes', [] );
+	protected function loadRoutesGroup( string $group ): void {
+		$config = $this->resolve( Configuration::class );
+		$file   = $config->get( 'routes.' . $group . '.definitions', '' );
+		$attributes = $config->get( 'routes.' . $group . '.attributes', [] );
 
 		if ( empty( $file ) ) {
 			return;
@@ -147,12 +159,12 @@ class Application {
 		$middleware = Arr::get( $attributes, 'middleware', [] );
 
 		if ( ! in_array( $group, $middleware, true ) ) {
-			$middleware = array_merge( [$group], $middleware );
+			$middleware = array_merge( [ $group ], $middleware );
 		}
 
 		$attributes['middleware'] = $middleware;
 
-		$blueprint = $this->resolve( WPEMERGE_ROUTING_ROUTE_BLUEPRINT_KEY );
+		$blueprint = $this->resolve( \WPEmerge\Routing\RouteBlueprint::class );
 		$blueprint->attributes( $attributes )->group( $file );
 	}
 
@@ -163,7 +175,7 @@ class Application {
 	 * @param  Closure $action
 	 * @return void
 	 */
-	public function renderConfigExceptions( Closure $action ) {
+	public function renderConfigExceptions( Closure $action ): void {
 		try {
 			$action();
 		} catch ( ConfigurationException $exception ) {
@@ -171,13 +183,13 @@ class Application {
 				throw $exception;
 			}
 
-			$request = Request::fromGlobals();
-			$handler = $this->resolve( WPEMERGE_EXCEPTIONS_CONFIGURATION_ERROR_HANDLER_KEY );
+			$request         = Request::fromGlobals();
+			$error_handler   = $this->resolve( \WPEmerge\Exceptions\ErrorHandlerInterface::class );
 
 			add_filter( 'wpemerge.pretty_errors.apply_admin_styles', '__return_false' );
 
-			$response_service = $this->resolve( WPEMERGE_RESPONSE_SERVICE_KEY );
-			$response_service->respond( $handler->getResponse( $request, $exception ) );
+			$response_service = $this->resolve( ResponseService::class );
+			$response_service->respond( $error_handler->getResponse( $request, $exception ) );
 
 			wp_die();
 		}

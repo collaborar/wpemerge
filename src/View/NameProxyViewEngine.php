@@ -20,7 +20,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 *
 	 * @var string
 	 */
-	protected $default = WPEMERGE_VIEW_PHP_VIEW_ENGINE_KEY;
+	protected $default = PhpViewEngine::class;
 
 	/**
 	 * Application.
@@ -55,7 +55,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function exists( $view ) {
+	public function exists( string $view ): bool {
 		$engine_key = $this->getBindingForFile( $view );
 		$engine = $this->app->resolve( $engine_key );
 		return $engine->exists( $view );
@@ -64,7 +64,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function canonical( $view ) {
+	public function canonical( string $view ): string {
 		$engine_key = $this->getBindingForFile( $view );
 		$engine = $this->app->resolve( $engine_key );
 		return $engine->canonical( $view );
@@ -74,7 +74,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 * {@inheritDoc}
 	 * @throws ViewNotFoundException
 	 */
-	public function make( $views ) {
+	public function make( array $views ): ViewInterface {
 		foreach ( $views as $view ) {
 			if ( $this->exists( $view ) ) {
 				$engine_key = $this->getBindingForFile( $view );

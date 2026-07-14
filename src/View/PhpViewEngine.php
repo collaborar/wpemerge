@@ -56,14 +56,14 @@ class PhpViewEngine implements ViewEngineInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function exists( $view ) {
+	public function exists( string $view ): bool {
 		return $this->finder->exists( $view );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function canonical( $view ) {
+	public function canonical( string $view ): string {
 		return $this->finder->canonical( $view );
 	}
 
@@ -71,7 +71,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * {@inheritDoc}
 	 * @throws ViewNotFoundException
 	 */
-	public function make( $views ) {
+	public function make( array $views ): ViewInterface {
 		foreach ( $views as $view ) {
 			if ( $this->exists( $view ) ) {
 				$filepath = $this->finder->resolveFilepath( $view );

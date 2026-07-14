@@ -9,28 +9,21 @@
 
 namespace WPEmerge\Controllers;
 
-use WPEmerge;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use WPEmerge\View\ViewService;
 
 /**
  * Provide controller dependencies
  *
  * @codeCoverageIgnore
  */
-class ControllersServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ WordPressController::class ] = function ( $c ) {
-			return new WordPressController( $c[ WPEMERGE_VIEW_SERVICE_KEY ] );
-		};
+class ControllersServiceProvider extends AbstractServiceProvider {
+
+	public function provides( string $id ): bool {
+		return $id === WordPressController::class;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function register(): void {
+		$this->getContainer()->addShared( WordPressController::class )->addArguments( [ ViewService::class ] );
 	}
 }

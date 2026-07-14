@@ -9,64 +9,60 @@
 
 namespace WPEmerge\Application;
 
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use Psr\Container\ContainerInterface;
 use WPEmerge\Helpers\HandlerFactory;
 use WPEmerge\Helpers\MixedType;
 use WPEmerge\ServiceProviders\ExtendsConfigTrait;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
 
 /**
  * Provide application dependencies.
  *
  * @codeCoverageIgnore
  */
-class ApplicationServiceProvider implements ServiceProviderInterface {
+class ApplicationServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 	use ExtendsConfigTrait;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$this->extendConfig( $container, 'providers', [] );
-		$this->extendConfig( $container, 'namespace', 'App\\' );
-
-		$upload_dir = wp_upload_dir();
-		$cache_dir = MixedType::addTrailingSlash( $upload_dir['basedir'] ) . 'wpemerge' . DIRECTORY_SEPARATOR . 'cache';
-		$this->extendConfig( $container, 'cache', [
-			'path' => $cache_dir,
-		] );
-
-		$container[ WPEMERGE_APPLICATION_GENERIC_FACTORY_KEY ] = function ( $c ) {
-			return new GenericFactory( $c );
-		};
-
-		$container[ WPEMERGE_APPLICATION_CLOSURE_FACTORY_KEY ] = function ( $c ) {
-			return new ClosureFactory( $c[ WPEMERGE_APPLICATION_GENERIC_FACTORY_KEY ] );
-		};
-
-		$container[ WPEMERGE_HELPERS_HANDLER_FACTORY_KEY ] = function ( $c ) {
-			return new HandlerFactory( $c[ WPEMERGE_APPLICATION_GENERIC_FACTORY_KEY ] );
-		};
-
-		$container[ WPEMERGE_APPLICATION_FILESYSTEM_KEY ] = function ( $c ) {
-			global $wp_filesystem;
-
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-
-			WP_Filesystem();
-
-			return $wp_filesystem;
-		};
-
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-		$app->alias( 'app', WPEMERGE_APPLICATION_KEY );
-		$app->alias( 'closure', WPEMERGE_APPLICATION_CLOSURE_FACTORY_KEY );
+	public function provides( string $id ): bool {
+		return in_array( $id, [
+			GenericFactory::class,
+			ClosureFactory::class,
+			HandlerFactory::class,
+			\WP_Filesystem_Base::class,
+		], true );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		$cache_dir = $container[ WPEMERGE_CONFIG_KEY ]['cache']['path'];
-		wp_mkdir_p( $cache_dir );
+	public function boot(): void {
+		$this->extendConfig( 'providers', [] );
+		$this->extendConfig( 'namespace', 'App\\' );
+
+		$uploadDir = wp_upload_dir();
+		$cacheDir  = MixedType::addTrailingSlash( $uploadDir['basedir'] ) . 'wpemerge' . DIRECTORY_SEPARATOR . 'cache';
+		$this->extendConfig( 'cache', [ 'path' => $cacheDir ] );
+
+		$config        = $this->getContainer()->get( Configuration::class );
+		$resolvedCache = $config->get( 'cache.path' );
+		wp_mkdir_p( $resolvedCache );
+
+		$app = $this->getContainer()->get( Application::class );
+		$app->alias( 'app', Application::class );
+		$app->alias( 'closure', ClosureFactory::class );
+	}
+
+	public function register(): void {
+		$c = $this->getContainer();
+
+		$c->addShared( GenericFactory::class )->addArguments( [ ContainerInterface::class ] );
+
+		$c->addShared( ClosureFactory::class )->addArguments( [ GenericFactory::class ] );
+
+		$c->addShared( HandlerFactory::class )->addArguments( [ GenericFactory::class ] );
+
+		$c->addShared( \WP_Filesystem_Base::class, function () {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+			return $GLOBALS['wp_filesystem'];
+		} );
 	}
 }

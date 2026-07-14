@@ -101,7 +101,7 @@ class UrlCondition implements ConditionInterface, UrlableInterface, CanFilterQue
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		if ( $this->getUrl() === static::WILDCARD ) {
 			return true;
 		}
@@ -120,7 +120,7 @@ class UrlCondition implements ConditionInterface, UrlableInterface, CanFilterQue
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		$validation_pattern = $this->getValidationPattern( $this->getUrl() );
 		$url = UrlUtility::addTrailingSlash( UrlUtility::getPath( $request ) );
 		$matches = [];
@@ -275,7 +275,7 @@ class UrlCondition implements ConditionInterface, UrlableInterface, CanFilterQue
 	/**
 	 * {@inheritDoc}
 	 */
-	public function toUrl( $arguments = [] ) {
+	public function toUrl( array $arguments = [] ): string {
 		$url = preg_replace_callback( $this->url_pattern, function ( $matches ) use ( $arguments ) {
 			$name = $matches['name'];
 			$optional = ! empty( $matches['optional'] );

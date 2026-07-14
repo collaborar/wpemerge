@@ -22,7 +22,7 @@ interface RouteInterface extends HasAttributesInterface {
 	 * @param  RequestInterface $request
 	 * @return boolean
 	 */
-	public function isSatisfied( RequestInterface $request );
+	public function isSatisfied( RequestInterface $request ): bool;
 
 	/**
 	 * Get arguments.
@@ -30,5 +30,5 @@ interface RouteInterface extends HasAttributesInterface {
 	 * @param  RequestInterface $request
 	 * @return array
 	 */
-	public function getArguments( RequestInterface $request );
+	public function getArguments( RequestInterface $request ): array;
 }

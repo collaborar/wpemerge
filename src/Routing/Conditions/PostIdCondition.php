@@ -37,21 +37,21 @@ class PostIdCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		return ( is_singular() && $this->post_id === (int) get_the_ID() );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['post_id' => $this->post_id];
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function toUrl( $arguments = [] ) {
+	public function toUrl( array $arguments = [] ): string {
 		return get_permalink( $this->post_id );
 	}
 }

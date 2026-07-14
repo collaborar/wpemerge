@@ -35,14 +35,14 @@ class NegateCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		return ! $this->condition->isSatisfied( $request );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return $this->condition->getArguments( $request );
 	}
 }

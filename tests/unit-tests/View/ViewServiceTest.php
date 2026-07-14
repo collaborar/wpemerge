@@ -3,6 +3,7 @@
 namespace WPEmergeTests\View;
 
 use Mockery;
+use WPEmerge\Application\Configuration;
 use WPEmerge\Helpers\Handler;
 use WPEmerge\Helpers\HandlerFactory;
 use WPEmerge\View\ViewService;
@@ -18,7 +19,8 @@ class ViewServiceTest extends TestCase {
 		$this->engine = Mockery::mock( ViewEngineInterface::class )->shouldIgnoreMissing();
 		$this->handler_factory = Mockery::mock( HandlerFactory::class )->shouldIgnoreMissing();
 		$this->factory_handler = Mockery::mock( Handler::class );
-		$this->subject = Mockery::mock( ViewService::class, [['namespace' => ''], $this->engine, $this->handler_factory] )->makePartial();
+		$config = new Configuration( ['namespace' => ''] );
+		$this->subject = Mockery::mock( ViewService::class, [$config, $this->engine, $this->handler_factory] )->makePartial();
 
 		$this->handler_factory->shouldReceive( 'make' )
 			->andReturn( $this->factory_handler );

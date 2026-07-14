@@ -29,7 +29,7 @@ class CsrfMiddleware {
 	 *
 	 * @param Csrf $csrf
 	 */
-	public function __construct( $csrf ) {
+	public function __construct( Csrf $csrf ) {
 		$this->csrf = $csrf;
 	}
 

@@ -9,50 +9,54 @@
 
 namespace WPEmerge\Responses;
 
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use WPEmerge\Application\Application;
+use WPEmerge\Requests\RequestInterface;
+use WPEmerge\View\ViewService;
 
 /**
  * Provide responses dependencies.
  *
  * @codeCoverageIgnore
  */
-class ResponsesServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ WPEMERGE_RESPONSE_SERVICE_KEY ] = function ( $c ) {
-			return new ResponseService( $c[ WPEMERGE_REQUEST_KEY ], $c[ WPEMERGE_VIEW_SERVICE_KEY ] );
-		};
+class ResponsesServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-		$app->alias( 'responses', WPEMERGE_RESPONSE_SERVICE_KEY );
-
-		$app->alias( 'response', function () use ( $app ) {
-			return call_user_func_array( [$app->responses(), 'response'], func_get_args() );
-		} );
-
-		$app->alias( 'output', function () use ( $app ) {
-			return call_user_func_array( [$app->responses(), 'output'], func_get_args() );
-		} );
-
-		$app->alias( 'json', function () use ( $app ) {
-			return call_user_func_array( [$app->responses(), 'json'], func_get_args() );
-		} );
-
-		$app->alias( 'redirect', function () use ( $app ) {
-			return call_user_func_array( [$app->responses(), 'redirect'], func_get_args() );
-		} );
-
-		$app->alias( 'error', function () use ( $app ) {
-			return call_user_func_array( [$app->responses(), 'error'], func_get_args() );
-		} );
+	public function provides(string $id): bool {
+		return $id === ResponseService::class;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function boot(): void {
+		// Aliases need to be registered eagerly (they are accessed statically before services are resolved)
+		$app = $this->getContainer()->get(Application::class);
+
+		$app->alias('responses', ResponseService::class);
+
+		$app->alias('response', function () use ($app) {
+			return call_user_func_array([$app->responses(), 'response'], func_get_args());
+		});
+
+		$app->alias('output', function () use ($app) {
+			return call_user_func_array([$app->responses(), 'output'], func_get_args());
+		});
+
+		$app->alias('json', function () use ($app) {
+			return call_user_func_array([$app->responses(), 'json'], func_get_args());
+		});
+
+		$app->alias('redirect', function () use ($app) {
+			return call_user_func_array([$app->responses(), 'redirect'], func_get_args());
+		});
+
+		$app->alias('error', function () use ($app) {
+			return call_user_func_array([$app->responses(), 'error'], func_get_args());
+		});
+	}
+
+	public function register(): void {
+		$this->getContainer()->addShared( ResponseService::class )->addArguments( [
+			RequestInterface::class,
+			ViewService::class,
+		] );
 	}
 }

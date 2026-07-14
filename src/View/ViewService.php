@@ -10,6 +10,7 @@
 namespace WPEmerge\View;
 
 use Closure;
+use WPEmerge\Application\Configuration;
 use WPEmerge\Helpers\Handler;
 use WPEmerge\Helpers\HandlerFactory;
 use WPEmerge\Helpers\MixedType;
@@ -21,9 +22,9 @@ class ViewService {
 	/**
 	 * Configuration.
 	 *
-	 * @var array<string, mixed>
+	 * @var Configuration
 	 */
-	protected $config = [];
+	protected Configuration $config;
 
 	/**
 	 * View engine.
@@ -57,11 +58,11 @@ class ViewService {
 	 * Constructor.
 	 *
 	 * @codeCoverageIgnore
-	 * @param array<string, mixed> $config
-	 * @param ViewEngineInterface  $engine
-	 * @param HandlerFactory       $handler_factory
+	 * @param Configuration      $config
+	 * @param ViewEngineInterface $engine
+	 * @param HandlerFactory      $handler_factory
 	 */
-	public function __construct( $config, ViewEngineInterface $engine, HandlerFactory $handler_factory ) {
+	public function __construct( Configuration $config, ViewEngineInterface $engine, HandlerFactory $handler_factory ) {
 		$this->config = $config;
 		$this->engine = $engine;
 		$this->handler_factory = $handler_factory;
@@ -131,7 +132,7 @@ class ViewService {
 			return $this->engine->canonical( $view );
 		}, MixedType::toArray( $views ) );
 
-		$handler = $this->handler_factory->make( $composer, 'compose', $this->config['namespace'] );
+		$handler = $this->handler_factory->make( $composer, 'compose', $this->config->get( 'namespace', 'App\\ViewComposers\\' ) );
 
 		$this->composers[] = [
 			'views' => $views,

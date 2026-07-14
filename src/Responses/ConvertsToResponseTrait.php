@@ -18,7 +18,7 @@ trait ConvertsToResponseTrait {
 	 *
 	 * @return ResponseService
 	 */
-	abstract protected function getResponseService();
+	abstract protected function getResponseService(): ResponseService;
 
 	/**
 	 * Convert a user returned response to a ResponseInterface instance if possible.

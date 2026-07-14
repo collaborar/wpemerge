@@ -46,7 +46,7 @@ class PostTemplateCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		$template = get_post_meta( (int) get_the_ID(), '_wp_page_template', true );
 		$template = $template ? $template : 'default';
 		return ( is_singular( $this->post_types ) && $this->post_template === $template );
@@ -55,7 +55,7 @@ class PostTemplateCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['post_template' => $this->post_template, 'post_types' => $this->post_types];
 	}
 }

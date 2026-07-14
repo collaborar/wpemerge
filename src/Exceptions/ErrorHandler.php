@@ -44,11 +44,12 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * Constructor.
 	 *
 	 * @codeCoverageIgnore
-	 * @param ResponseService   $response_service
-	 * @param RunInterface|null $whoops
-	 * @param boolean           $debug
 	 */
-	public function __construct( $response_service, $whoops, $debug = false ) {
+	public function __construct(
+		ResponseService $response_service,
+		?RunInterface $whoops = null,
+		bool $debug = false
+	) {
 		$this->response_service = $response_service;
 		$this->whoops = $whoops;
 		$this->debug = $debug;
@@ -58,7 +59,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * {@inheritDoc}
 	 * @codeCoverageIgnore
 	 */
-	public function register() {
+	public function register(): void {
 		if ( $this->debug && $this->whoops !== null ) {
 			$this->whoops->register();
 		}
@@ -68,7 +69,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * {@inheritDoc}
 	 * @codeCoverageIgnore
 	 */
-	public function unregister() {
+	public function unregister(): void {
 		if ( $this->debug && $this->whoops !== null ) {
 			$this->whoops->unregister();
 		}
@@ -141,7 +142,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * {@inheritDoc}
 	 * @throws PhpException
 	 */
-	public function getResponse( RequestInterface $request, PhpException $exception ) {
+	public function getResponse( RequestInterface $request, PhpException $exception ): ResponseInterface {
 		$response = $this->toResponse( $exception );
 
 		if ( $response !== false ) {

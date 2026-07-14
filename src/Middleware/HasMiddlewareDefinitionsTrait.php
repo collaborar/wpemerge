@@ -47,7 +47,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  array<string, string> $middleware
 	 * @return void
 	 */
-	public function setMiddleware( $middleware ) {
+	public function setMiddleware( array $middleware ): void {
 		$this->middleware = $middleware;
 	}
 
@@ -58,7 +58,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  array<string, string[]> $middleware_groups
 	 * @return void
 	 */
-	public function setMiddlewareGroups( $middleware_groups ) {
+	public function setMiddlewareGroups( array $middleware_groups ): void {
 		$this->middleware_groups = $middleware_groups;
 	}
 
@@ -68,7 +68,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  array[]  $middleware
 	 * @return string[]
 	 */
-	public function uniqueMiddleware( $middleware ) {
+	public function uniqueMiddleware( array $middleware ): array {
 		return array_values( array_unique( $middleware, SORT_REGULAR ) );
 	}
 
@@ -78,7 +78,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  string[] $middleware
 	 * @return array[]
 	 */
-	public function expandMiddleware( $middleware ) {
+	public function expandMiddleware( array $middleware ): array {
 		$classes = [];
 
 		foreach ( $middleware as $item ) {
@@ -97,7 +97,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  string  $group
 	 * @return array[]
 	 */
-	public function expandMiddlewareGroup( $group ) {
+	public function expandMiddlewareGroup( string $group ): array {
 		if ( ! isset( $this->middleware_groups[ $group ] ) ) {
 			throw new ConfigurationException( 'Unknown middleware group "' . $group . '" used.' );
 		}
@@ -117,7 +117,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  string  $middleware
 	 * @return array[]
 	 */
-	public function expandMiddlewareMolecule( $middleware ) {
+	public function expandMiddlewareMolecule( string $middleware ): array {
 		$pieces = explode( ':', $middleware, 2 );
 
 		if ( count( $pieces ) > 1 ) {
@@ -137,7 +137,7 @@ trait HasMiddlewareDefinitionsTrait {
 	 * @param  string $middleware
 	 * @return string
 	 */
-	public function expandMiddlewareAtom( $middleware ) {
+	public function expandMiddlewareAtom( string $middleware ): string {
 		if ( isset( $this->middleware[ $middleware ] ) ) {
 			return $this->middleware[ $middleware ];
 		}
