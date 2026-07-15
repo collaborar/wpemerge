@@ -27,7 +27,7 @@ trait ConvertsToResponseTrait {
 	 * @param  mixed $response
 	 * @return mixed
 	 */
-	protected function toResponse( $response ) {
+	protected function toResponse( mixed $response ): mixed {
 		if ( is_string( $response ) ) {
 			return $this->getResponseService()->output( $response );
 		}

@@ -21,24 +21,18 @@ use WPEmerge\Support\Arr;
 class ErrorHandler implements ErrorHandlerInterface {
 	/**
 	 * Response service.
-	 *
-	 * @var ResponseService
 	 */
-	protected $response_service = null;
+	protected ResponseService $response_service;
 
 	/**
 	 * Pretty handler.
-	 *
-	 * @var RunInterface|null
 	 */
-	protected $whoops = null;
+	protected ?RunInterface $whoops = null;
 
 	/**
 	 * Whether debug mode is enabled.
-	 *
-	 * @var boolean
 	 */
-	protected $debug = false;
+	protected bool $debug = false;
 
 	/**
 	 * Constructor.
@@ -81,7 +75,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * @param  PhpException            $exception
 	 * @return ResponseInterface|false
 	 */
-	protected function toResponse( $exception ) {
+	protected function toResponse( PhpException $exception ): ResponseInterface|false {
 		// @codeCoverageIgnoreStart
 		if ( $exception instanceof InvalidCsrfTokenException ) {
 			wp_nonce_ays( '' );
@@ -103,7 +97,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * @param  PhpException      $exception
 	 * @return ResponseInterface
 	 */
-	protected function toDebugResponse( RequestInterface $request, PhpException $exception ) {
+	protected function toDebugResponse( RequestInterface $request, PhpException $exception ): ResponseInterface {
 		if ( $request->isAjax() ) {
 			return $this->response_service->json( [
 				'message' => $exception->getMessage(),
@@ -130,7 +124,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * @param  PhpException      $exception
 	 * @return ResponseInterface
 	 */
-	protected function toPrettyErrorResponse( $exception ) {
+	protected function toPrettyErrorResponse( PhpException $exception ): ResponseInterface {
 		$method = RunInterface::EXCEPTION_HANDLER;
 		ob_start();
 		$this->whoops->$method( $exception );

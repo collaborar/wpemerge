@@ -20,21 +20,21 @@ trait HasMiddlewareDefinitionsTrait {
 	 *
 	 * @var array<string, string>
 	 */
-	protected $middleware = [];
+	protected array $middleware = [];
 
 	/**
 	 * Middleware groups.
 	 *
 	 * @var array<string, string[]>
 	 */
-	protected $middleware_groups = [];
+	protected array $middleware_groups = [];
 
 	/**
 	 * Middleware groups that should have the 'wpemerge' and 'global' groups prepended to them.
 	 *
 	 * @var string[]
 	 */
-	protected $prepend_special_groups_to = [
+	protected array $prepend_special_groups_to = [
 		'web',
 		'admin',
 		'ajax',
@@ -82,10 +82,10 @@ trait HasMiddlewareDefinitionsTrait {
 		$classes = [];
 
 		foreach ( $middleware as $item ) {
-			$classes = array_merge(
-				$classes,
-				$this->expandMiddlewareMolecule( $item )
-			);
+			$classes = [
+				...$classes,
+				...$this->expandMiddlewareMolecule( $item ),
+			];
 		}
 
 		return $classes;
@@ -105,7 +105,7 @@ trait HasMiddlewareDefinitionsTrait {
 		$middleware = $this->middleware_groups[ $group ];
 
 		if ( in_array( $group, $this->prepend_special_groups_to, true ) ) {
-			$middleware = array_merge( ['wpemerge', 'global'], $middleware );
+			$middleware = ['wpemerge', 'global', ...$middleware];
 		}
 
 		return $this->expandMiddleware( $middleware );
@@ -121,7 +121,7 @@ trait HasMiddlewareDefinitionsTrait {
 		$pieces = explode( ':', $middleware, 2 );
 
 		if ( count( $pieces ) > 1 ) {
-			return [array_merge( [$this->expandMiddlewareAtom( $pieces[0] )], explode( ',', $pieces[1] ) )];
+			return [[$this->expandMiddlewareAtom( $pieces[0] ), ...explode( ',', $pieces[1] )]];
 		}
 
 		if ( isset( $this->middleware_groups[ $middleware ] ) ) {

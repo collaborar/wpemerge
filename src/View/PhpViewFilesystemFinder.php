@@ -20,7 +20,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 *
 	 * @var string[]
 	 */
-	protected $directories = [];
+	protected array $directories = [];
 
 	/**
 	 * Constructor.
@@ -28,7 +28,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 * @codeCoverageIgnore
 	 * @param string[] $directories
 	 */
-	public function __construct( $directories = [] ) {
+	public function __construct( array $directories = [] ) {
 		$this->setDirectories( $directories );
 	}
 
@@ -38,7 +38,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 * @codeCoverageIgnore
 	 * @return string[]
 	 */
-	public function getDirectories() {
+	public function getDirectories(): array {
 		return $this->directories;
 	}
 
@@ -49,7 +49,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 * @param  string[] $directories
 	 * @return void
 	 */
-	public function setDirectories( $directories ) {
+	public function setDirectories( array $directories ): void {
 		$this->directories = array_filter( array_map( [MixedType::class, 'removeTrailingSlash'], $directories ) );
 	}
 
@@ -73,7 +73,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 * @param  string $view
 	 * @return string
 	 */
-	public function resolveFilepath( $view ) {
+	public function resolveFilepath( string $view ): string {
 		$file = $this->resolveFromAbsoluteFilepath( $view );
 
 		if ( ! $file ) {
@@ -89,7 +89,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 * @param  string $view
 	 * @return string
 	 */
-	protected function resolveFromAbsoluteFilepath( $view ) {
+	protected function resolveFromAbsoluteFilepath( string $view ): string {
 		$path = realpath( MixedType::normalizePath( $view ) );
 
 		if ( ! empty( $path ) && ! is_file( $path ) ) {
@@ -105,7 +105,7 @@ class PhpViewFilesystemFinder implements ViewFinderInterface {
 	 * @param  string $view
 	 * @return string
 	 */
-	protected function resolveFromCustomDirectories( $view ) {
+	protected function resolveFromCustomDirectories( string $view ): string {
 		$directories = $this->getDirectories();
 
 		foreach ( $directories as $directory ) {

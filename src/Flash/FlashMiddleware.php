@@ -18,10 +18,8 @@ use WPEmerge\Requests\RequestInterface;
 class FlashMiddleware {
 	/**
 	 * Flash service.
-	 *
-	 * @var Flash
 	 */
-	protected $flash = null;
+	protected Flash $flash;
 
 	/**
 	 * Constructor.

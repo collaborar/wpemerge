@@ -20,28 +20,28 @@ use WPEmerge\Application\Application;
  */
 class FlashServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-	public function provides(string $id): bool {
-		return in_array($id, [Flash::class, FlashMiddleware::class], true);
+	public function provides( string $id ): bool {
+		return in_array( $id, [Flash::class, FlashMiddleware::class], true );
 	}
 
 	public function boot(): void {
-		$app = $this->getContainer()->get(Application::class);
-		$app->alias('flash', Flash::class);
+		$app = $this->getContainer()->get( Application::class );
+		$app->alias( 'flash', Flash::class );
 	}
 
 	public function register(): void {
 		$c = $this->getContainer();
 
-		$c->addShared(Flash::class, function () use ($c) {
-			if ($c->has(WPEMERGE_SESSION_KEY)) {
-				$session = $c->get(WPEMERGE_SESSION_KEY);
-			} elseif (isset($_SESSION)) {
+		$c->addShared( Flash::class, function () use ( $c ) {
+			if ( $c->has( WPEMERGE_SESSION_KEY ) ) {
+				$session = $c->get( WPEMERGE_SESSION_KEY );
+			} elseif ( isset( $_SESSION ) ) {
 				$session = &$_SESSION;
 			} else {
 				$session = null;
 			}
-			return new Flash($session);
-		});
+			return new Flash( $session );
+		} );
 
 		$c->addShared( FlashMiddleware::class )->addArguments( [ Flash::class ] );
 	}

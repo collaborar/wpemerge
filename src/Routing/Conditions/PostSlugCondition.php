@@ -19,10 +19,8 @@ use WPEmerge\Requests\RequestInterface;
 class PostSlugCondition implements ConditionInterface {
 	/**
 	 * Post slug to check against
-	 *
-	 * @var string
 	 */
-	protected $post_slug = '';
+	protected string $post_slug = '';
 
 	/**
 	 * Constructor
@@ -30,7 +28,7 @@ class PostSlugCondition implements ConditionInterface {
 	 * @codeCoverageIgnore
 	 * @param string $post_slug
 	 */
-	public function __construct( $post_slug ) {
+	public function __construct( string $post_slug ) {
 		$this->post_slug = $post_slug;
 	}
 

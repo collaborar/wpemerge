@@ -13,10 +13,8 @@ use WPEmerge\Routing\Router;
 class DebugDataProvider {
 	/**
 	 * Container.
-	 *
-	 * @var ContainerInterface
 	 */
-	protected $container = null;
+	protected ContainerInterface $container;
 
 	/**
 	 * Constructor.
@@ -33,7 +31,7 @@ class DebugDataProvider {
 	 * @param  mixed $value
 	 * @return mixed
 	 */
-	public function toScalar( $value ) {
+	public function toScalar( mixed $value ): mixed {
 		$type = gettype( $value );
 
 		if ( ! is_scalar( $value ) ) {
@@ -49,7 +47,7 @@ class DebugDataProvider {
 	 * @param \Whoops\Exception\Inspector $inspector
 	 * @return array<string, mixed>
 	 */
-	public function route( $inspector ) {
+	public function route( \Whoops\Exception\Inspector $inspector ): array {
 		/** @var \WPEmerge\Routing\RouteInterface|null $route */
 		$route = $this->container->get( Router::class )->getCurrentRoute();
 

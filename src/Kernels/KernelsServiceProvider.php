@@ -55,9 +55,9 @@ class KernelsServiceProvider extends AbstractServiceProvider implements Bootable
 		$this->extendConfig( 'middleware_priority', [] );
 
 		$app = $this->getContainer()->get( Application::class );
-		$app->alias( 'run', function () use ( $app ) {
+		$app->alias( 'run', function ( ...$args ) use ( $app ) {
 			$kernel = $app->resolve( HttpKernelInterface::class );
-			return call_user_func_array( [$kernel, 'run'], func_get_args() );
+			return $kernel->run( ...$args );
 		} );
 	}
 

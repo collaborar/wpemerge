@@ -29,15 +29,11 @@ class Application {
 
 	/**
 	 * Flag whether to intercept and render configuration exceptions.
-	 *
-	 * @var bool
 	 */
 	protected bool $render_config_exceptions = true;
 
 	/**
 	 * Flag whether the application has been bootstrapped.
-	 *
-	 * @var bool
 	 */
 	protected bool $bootstrapped = false;
 
@@ -159,7 +155,7 @@ class Application {
 		$middleware = Arr::get( $attributes, 'middleware', [] );
 
 		if ( ! in_array( $group, $middleware, true ) ) {
-			$middleware = array_merge( [ $group ], $middleware );
+			$middleware = [$group, ...$middleware];
 		}
 
 		$attributes['middleware'] = $middleware;

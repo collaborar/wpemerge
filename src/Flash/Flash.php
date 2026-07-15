@@ -26,24 +26,20 @@ class Flash {
 
 	/**
 	 * Key to store flashed data in store with.
-	 *
-	 * @var string
 	 */
-	protected $store_key = '';
+	protected string $store_key = '';
 
 	/**
 	 * Root store array or object implementing ArrayAccess.
 	 *
-	 * @var array|ArrayAccess
+	 * @var array|ArrayAccess|null
 	 */
 	protected $store = null;
 
 	/**
 	 * Flash store array.
-	 *
-	 * @var array
 	 */
-	protected $flashed = [];
+	protected array $flashed = [];
 
 	/**
 	 * Constructor.
@@ -52,7 +48,7 @@ class Flash {
 	 * @param array|ArrayAccess $store
 	 * @param string             $store_key
 	 */
-	public function __construct( &$store, $store_key = '__wpemergeFlash' ) {
+	public function __construct( mixed &$store = null, string $store_key = '__wpemergeFlash' ) {
 		$this->store_key = $store_key;
 		$this->setStore( $store );
 	}
@@ -63,7 +59,7 @@ class Flash {
 	 * @param  mixed   $store
 	 * @return boolean
 	 */
-	protected function isValidStore( $store ) {
+	protected function isValidStore( mixed $store ): bool {
 		return ( is_array( $store ) || $store instanceof ArrayAccess );
 	}
 
@@ -72,7 +68,7 @@ class Flash {
 	 *
 	 * @return void
 	 */
-	protected function validateStore() {
+	protected function validateStore(): void {
 		if ( ! $this->isValidStore( $this->store ) ) {
 			throw new ConfigurationException(
 				'Attempted to use Flash without an active session. ' .
@@ -86,7 +82,7 @@ class Flash {
 	 *
 	 * @return array|ArrayAccess
 	 */
-	public function getStore() {
+	public function getStore(): array|ArrayAccess|null {
 		return $this->store;
 	}
 
@@ -96,7 +92,7 @@ class Flash {
 	 * @param  array|ArrayAccess $store
 	 * @return void
 	 */
-	public function setStore( &$store ) {
+	public function setStore( mixed &$store ): void {
 		if ( ! $this->isValidStore( $store ) ) {
 			return;
 		}
@@ -118,7 +114,7 @@ class Flash {
 	 *
 	 * @return boolean
 	 */
-	public function enabled() {
+	public function enabled(): bool {
 		return $this->isValidStore( $this->store );
 	}
 
@@ -130,7 +126,7 @@ class Flash {
 	 * @param  mixed $default
 	 * @return mixed
 	 */
-	protected function getFromRequest( $request_key, $key = null, $default = [] ) {
+	protected function getFromRequest( string $request_key, ?string $key = null, mixed $default = [] ): mixed {
 		$this->validateStore();
 
 		if ( $key === null ) {
@@ -148,12 +144,12 @@ class Flash {
 	 * @param  mixed $new_items
 	 * @return void
 	 */
-	protected function addToRequest( $request_key, $key, $new_items ) {
+	protected function addToRequest( string $request_key, string $key, mixed $new_items ): void {
 		$this->validateStore();
 
 		$new_items = MixedType::toArray( $new_items );
 		$items = MixedType::toArray( $this->getFromRequest( $request_key, $key, [] ) );
-		$this->flashed[ $request_key ][ $key ] = array_merge( $items, $new_items );
+		$this->flashed[ $request_key ][ $key ] = [...$items, ...$new_items];
 	}
 
 	/**
@@ -163,7 +159,7 @@ class Flash {
 	 * @param  string|null $key
 	 * @return void
 	 */
-	protected function clearFromRequest( $request_key, $key = null ) {
+	protected function clearFromRequest( string $request_key, ?string $key = null ): void {
 		$this->validateStore();
 
 		$keys = $key === null ? array_keys( $this->flashed[ $request_key ] ) : [$key];
@@ -179,7 +175,7 @@ class Flash {
 	 * @param  mixed $new_items
 	 * @return void
 	 */
-	public function add( $key, $new_items ) {
+	public function add( string $key, mixed $new_items ): void {
 		$this->addToRequest( static::NEXT_KEY, $key, $new_items );
 	}
 
@@ -190,7 +186,7 @@ class Flash {
 	 * @param  mixed $new_items
 	 * @return void
 	 */
-	public function addNow( $key, $new_items ) {
+	public function addNow( string $key, mixed $new_items ): void {
 		$this->addToRequest( static::CURRENT_KEY, $key, $new_items );
 	}
 
@@ -201,7 +197,7 @@ class Flash {
 	 * @param  mixed $default
 	 * @return mixed
 	 */
-	public function get( $key = null, $default = [] ) {
+	public function get( ?string $key = null, mixed $default = [] ): mixed {
 		return $this->getFromRequest( static::CURRENT_KEY, $key, $default );
 	}
 
@@ -212,7 +208,7 @@ class Flash {
 	 * @param  mixed $default
 	 * @return mixed
 	 */
-	public function getNext( $key = null, $default = [] ) {
+	public function getNext( ?string $key = null, mixed $default = [] ): mixed {
 		return $this->getFromRequest( static::NEXT_KEY, $key, $default );
 	}
 
@@ -222,7 +218,7 @@ class Flash {
 	 * @param  string|null $key
 	 * @return void
 	 */
-	public function clear( $key = null ) {
+	public function clear( ?string $key = null ): void {
 		$this->clearFromRequest( static::CURRENT_KEY, $key );
 	}
 
@@ -232,7 +228,7 @@ class Flash {
 	 * @param  string|null $key
 	 * @return void
 	 */
-	public function clearNext( $key = null ) {
+	public function clearNext( ?string $key = null ): void {
 		$this->clearFromRequest( static::NEXT_KEY, $key );
 	}
 
@@ -241,7 +237,7 @@ class Flash {
 	 *
 	 * @return void
 	 */
-	public function shift() {
+	public function shift(): void {
 		$this->validateStore();
 
 		$this->flashed[ static::CURRENT_KEY ] = $this->flashed[ static::NEXT_KEY ];
@@ -253,7 +249,7 @@ class Flash {
 	 *
 	 * @return void
 	 */
-	public function save() {
+	public function save(): void {
 		$this->validateStore();
 
 		$this->store[ $this->store_key ] = $this->flashed;

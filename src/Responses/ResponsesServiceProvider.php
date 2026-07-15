@@ -22,35 +22,35 @@ use WPEmerge\View\ViewService;
  */
 class ResponsesServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-	public function provides(string $id): bool {
+	public function provides( string $id ): bool {
 		return $id === ResponseService::class;
 	}
 
 	public function boot(): void {
 		// Aliases need to be registered eagerly (they are accessed statically before services are resolved)
-		$app = $this->getContainer()->get(Application::class);
+		$app = $this->getContainer()->get( Application::class );
 
-		$app->alias('responses', ResponseService::class);
+		$app->alias( 'responses', ResponseService::class );
 
-		$app->alias('response', function () use ($app) {
-			return call_user_func_array([$app->responses(), 'response'], func_get_args());
-		});
+		$app->alias('response', function ( ...$args ) use ( $app ) {
+			return $app->responses()->response( ...$args );
+		} );
 
-		$app->alias('output', function () use ($app) {
-			return call_user_func_array([$app->responses(), 'output'], func_get_args());
-		});
+		$app->alias('output', function ( ...$args ) use ( $app ) {
+			return $app->responses()->output( ...$args );
+		} );
 
-		$app->alias('json', function () use ($app) {
-			return call_user_func_array([$app->responses(), 'json'], func_get_args());
-		});
+		$app->alias('json', function ( ...$args ) use ( $app ) {
+			return $app->responses()->json( ...$args );
+		} );
 
-		$app->alias('redirect', function () use ($app) {
-			return call_user_func_array([$app->responses(), 'redirect'], func_get_args());
-		});
+		$app->alias('redirect', function ( ...$args ) use ( $app ) {
+			return $app->responses()->redirect( ...$args );
+		} );
 
-		$app->alias('error', function () use ($app) {
-			return call_user_func_array([$app->responses(), 'error'], func_get_args());
-		});
+		$app->alias('error', function ( ...$args ) use ( $app ) {
+			return $app->responses()->error( ...$args );
+		} );
 	}
 
 	public function register(): void {

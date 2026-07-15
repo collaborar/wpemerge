@@ -104,7 +104,7 @@ abstract class PostType {
 		// By default the `item_link_description` label have the value "A link to a %s",
 		// and depending of model label, gramatically it should be "A link to an %s".
 		if ( isset( $config['labels'] ) && is_array( $config['labels'] ) ) {
-			$config['labels'] = array_merge( $defaults['labels'], $config['labels'] );
+			$config['labels'] = [...$defaults['labels'], ...$config['labels']];
 		}
 
 		$config = wp_parse_args( $config, $defaults );

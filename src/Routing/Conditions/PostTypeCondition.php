@@ -19,10 +19,8 @@ use WPEmerge\Requests\RequestInterface;
 class PostTypeCondition implements ConditionInterface {
 	/**
 	 * Post type to check against
-	 *
-	 * @var string
 	 */
-	protected $post_type = '';
+	protected string $post_type = '';
 
 	/**
 	 * Constructor
@@ -30,7 +28,7 @@ class PostTypeCondition implements ConditionInterface {
 	 * @codeCoverageIgnore
 	 * @param string $post_type
 	 */
-	public function __construct( $post_type ) {
+	public function __construct( string $post_type ) {
 		$this->post_type = $post_type;
 	}
 

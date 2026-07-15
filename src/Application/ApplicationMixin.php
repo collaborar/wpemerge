@@ -26,7 +26,8 @@ final class ApplicationMixin {
 	/**
 	 * Prevent class instantiation.
 	 */
-	private function __construct() {}
+	private function __construct() {
+	}
 
 	// --- Methods --------------------------------------- //
 
@@ -35,7 +36,8 @@ final class ApplicationMixin {
 	 *
 	 * @return boolean
 	 */
-	public static function isBootstrapped() {}
+	public static function isBootstrapped() {
+	}
 
 	/**
 	 * Bootstrap the application.
@@ -44,7 +46,8 @@ final class ApplicationMixin {
 	 * @param  boolean $run
 	 * @return void
 	 */
-	public static function bootstrap( $config = [], $run = true ) {}
+	public static function bootstrap( $config = [], $run = true ) {
+	}
 
 	/**
 	 * Get the IoC container instance.
@@ -52,7 +55,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return Container
 	 */
-	public static function container() {}
+	public static function container() {
+	}
 
 	/**
 	 * Set the IoC container instance.
@@ -61,7 +65,8 @@ final class ApplicationMixin {
 	 * @param  Container $container
 	 * @return void
 	 */
-	public static function setContainer( $container ) {}
+	public static function setContainer( $container ) {
+	}
 
 	/**
 	 * Resolve a dependency from the IoC container.
@@ -69,7 +74,8 @@ final class ApplicationMixin {
 	 * @param  string     $key
 	 * @return mixed|null
 	 */
-	public static function resolve( $key ) {}
+	public static function resolve( $key ) {
+	}
 
 	// --- Aliases --------------------------------------- //
 
@@ -79,7 +85,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return \WPEmerge\Application\Application
 	 */
-	public static function app() {}
+	public static function app() {
+	}
 
 	/**
 	 * Get the ClosureFactory instance.
@@ -87,7 +94,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return ClosureFactory
 	 */
-	public static function closure() {}
+	public static function closure() {
+	}
 
 	/**
 	 * Get the CSRF service instance.
@@ -95,7 +103,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return \WPEmerge\Csrf\Csrf
 	 */
-	public static function csrf() {}
+	public static function csrf() {
+	}
 
 	/**
 	 * Get the Flash service instance.
@@ -103,7 +112,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return \WPEmerge\Flash\Flash
 	 */
-	public static function flash() {}
+	public static function flash() {
+	}
 
 	/**
 	 * Get the OldInput service instance.
@@ -111,7 +121,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return \WPEmerge\Input\OldInput
 	 */
-	public static function oldInput() {}
+	public static function oldInput() {
+	}
 
 	/**
 	 * Run a full middleware + handler pipeline independently of routes.
@@ -124,7 +135,8 @@ final class ApplicationMixin {
 	 * @param  array             $arguments
 	 * @return ResponseInterface
 	 */
-	public static function run( RequestInterface $request, $middleware, $handler, $arguments = [] ) {}
+	public static function run( RequestInterface $request, $middleware, $handler, $arguments = [] ) {
+	}
 
 	/**
 	 * Get the ResponseService instance.
@@ -132,7 +144,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return \WPEmerge\Responses\ResponseService
 	 */
-	public static function responses() {}
+	public static function responses() {
+	}
 
 	/**
 	 * Create a "blank" response.
@@ -141,7 +154,8 @@ final class ApplicationMixin {
 	 * @see    \WPEmerge\Responses\ResponseService::response()
 	 * @return ResponseInterface
 	 */
-	public static function response() {}
+	public static function response() {
+	}
 
 	/**
 	 * Create a response with the specified string as its body.
@@ -151,7 +165,8 @@ final class ApplicationMixin {
 	 * @param  string            $output
 	 * @return ResponseInterface
 	 */
-	public static function output( $output ) {}
+	public static function output( $output ) {
+	}
 
 	/**
 	 * Create a response with the specified data encoded as JSON as its body.
@@ -161,7 +176,8 @@ final class ApplicationMixin {
 	 * @param  mixed             $data
 	 * @return ResponseInterface
 	 */
-	public static function json( $data ) {}
+	public static function json( $data ) {
+	}
 
 	/**
 	 * Create a redirect response.
@@ -170,7 +186,8 @@ final class ApplicationMixin {
 	 * @see    \WPEmerge\Responses\ResponseService::redirect()
 	 * @return RedirectResponse
 	 */
-	public static function redirect() {}
+	public static function redirect() {
+	}
 
 	/**
 	 * Create a response with the specified error status code.
@@ -180,7 +197,8 @@ final class ApplicationMixin {
 	 * @param  integer           $status
 	 * @return ResponseInterface
 	 */
-	public static function error( $status ) {}
+	public static function error( $status ) {
+	}
 
 	/**
 	 * Get the ViewService instance.
@@ -188,7 +206,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return \WPEmerge\View\ViewService
 	 */
-	public static function views() {}
+	public static function views() {
+	}
 
 	/**
 	 * Create a view.
@@ -198,7 +217,8 @@ final class ApplicationMixin {
 	 * @param  string|string[] $views
 	 * @return ViewInterface
 	 */
-	public static function view( $views ) {}
+	public static function view( $views ) {
+	}
 
 	/**
 	 * Output child layout content.
@@ -207,7 +227,8 @@ final class ApplicationMixin {
 	 * @see    \WPEmerge\View\PhpViewEngine::getLayoutContent()
 	 * @return void
 	 */
-	public static function layoutContent() {}
+	public static function layoutContent() {
+	}
 
 	/**
 	 * Create a new route.
@@ -215,7 +236,8 @@ final class ApplicationMixin {
 	 * @codeCoverageIgnore
 	 * @return RouteBlueprint
 	 */
-	public static function route() {}
+	public static function route() {
+	}
 
 	/**
 	 * Output the specified view.
@@ -227,5 +249,6 @@ final class ApplicationMixin {
 	 * @param  array<string, mixed> $context
 	 * @return void
 	 */
-	public static function render( $views, $context = [] ) {}
+	public static function render( $views, $context = [] ) {
+	}
 }

@@ -18,10 +18,8 @@ use WPEmerge\Requests\RequestInterface;
 class OldInputMiddleware {
 	/**
 	 * OldInput service.
-	 *
-	 * @var OldInput
 	 */
-	protected $old_input = null;
+	protected OldInput $old_input;
 
 	/**
 	 * Constructor.

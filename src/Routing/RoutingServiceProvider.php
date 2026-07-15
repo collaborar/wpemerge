@@ -93,10 +93,10 @@ class RoutingServiceProvider extends AbstractServiceProvider implements Bootable
 		$c = $this->getContainer();
 
 		$c->addShared( ConditionFactory::class, function () use ( $c ) {
-			$conditionTypes = array_merge(
-				static::$condition_types,
-				$c->get( Configuration::class )->get( 'condition_types', [] )
-			);
+			$conditionTypes = [
+				...static::$condition_types,
+				...$c->get( Configuration::class )->get( 'condition_types', [] ),
+			];
 			return new ConditionFactory( $conditionTypes );
 		} );
 

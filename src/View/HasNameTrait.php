@@ -12,10 +12,8 @@ namespace WPEmerge\View;
 trait HasNameTrait {
 	/**
 	 * Name.
-	 *
-	 * @var string
 	 */
-	protected $name = '';
+	protected string $name = '';
 
 	/**
 	 * Get name.

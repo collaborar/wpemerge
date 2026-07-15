@@ -93,7 +93,7 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function attributes( $key = '', $default = null ): mixed;
+	public function attributes( string $key = '', mixed $default = null ): mixed;
 
 	/**
 	 * Get a value from the request query (i.e. $_GET).
@@ -102,7 +102,7 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function query( $key = '', $default = null ): mixed;
+	public function query( string $key = '', mixed $default = null ): mixed;
 
 	/**
 	 * Get a value from the request body (i.e. $_POST).
@@ -111,7 +111,7 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function body( $key = '', $default = null ): mixed;
+	public function body( string $key = '', mixed $default = null ): mixed;
 
 	/**
 	 * Get a value from the COOKIE parameters.
@@ -120,7 +120,7 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function cookies( $key = '', $default = null ): mixed;
+	public function cookies( string $key = '', mixed $default = null ): mixed;
 
 	/**
 	 * Get a value from the FILES parameters.
@@ -129,7 +129,7 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function files( $key = '', $default = null ): mixed;
+	public function files( string $key = '', mixed $default = null ): mixed;
 
 	/**
 	 * Get a value from the SERVER parameters.
@@ -138,7 +138,7 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function server( $key = '', $default = null ): mixed;
+	public function server( string $key = '', mixed $default = null ): mixed;
 
 	/**
 	 * Get a value from the headers.
@@ -147,5 +147,5 @@ interface RequestInterface extends ServerRequestInterface {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function headers( $key = '', $default = null ): mixed;
+	public function headers( string $key = '', mixed $default = null ): mixed;
 }

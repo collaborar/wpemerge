@@ -19,10 +19,8 @@ use WPEmerge\Requests\RequestInterface;
 class PostStatusCondition implements ConditionInterface {
 	/**
 	 * Post status to check against.
-	 *
-	 * @var string
 	 */
-	protected $post_status = '';
+	protected string $post_status = '';
 
 	/**
 	 * Constructor
@@ -30,7 +28,7 @@ class PostStatusCondition implements ConditionInterface {
 	 * @codeCoverageIgnore
 	 * @param string $post_status
 	 */
-	public function __construct( $post_status ) {
+	public function __construct( string $post_status ) {
 		$this->post_status = $post_status;
 	}
 

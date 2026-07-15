@@ -19,17 +19,13 @@ use WPEmerge\Requests\RequestInterface;
 class AdminCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * Menu slug.
-	 *
-	 * @var string
 	 */
-	protected $menu = '';
+	protected string $menu = '';
 
 	/**
 	 * Parent menu slug.
-	 *
-	 * @var string
 	 */
-	protected $parent_menu = '';
+	protected string $parent_menu = '';
 
 	/**
 	 * Constructor
@@ -38,7 +34,7 @@ class AdminCondition implements ConditionInterface, UrlableInterface {
 	 * @param string $menu
 	 * @param string $parent_menu
 	 */
-	public function __construct( $menu, $parent_menu = '' ) {
+	public function __construct( string $menu, string $parent_menu = '' ) {
 		$this->menu = $menu;
 		$this->parent_menu = $parent_menu;
 	}
@@ -48,7 +44,7 @@ class AdminCondition implements ConditionInterface, UrlableInterface {
 	 *
 	 * @return boolean
 	 */
-	protected function isAdminPage() {
+	protected function isAdminPage(): bool {
 		return is_admin() && ! wp_doing_ajax();
 	}
 

@@ -21,38 +21,28 @@ use WPEmerge\Helpers\MixedType;
 class ViewService {
 	/**
 	 * Configuration.
-	 *
-	 * @var Configuration
 	 */
 	protected Configuration $config;
 
 	/**
 	 * View engine.
-	 *
-	 * @var ViewEngineInterface
 	 */
-	protected $engine = null;
+	protected ViewEngineInterface $engine;
 
 	/**
 	 * Handler factory.
-	 *
-	 * @var HandlerFactory
 	 */
-	protected $handler_factory = null;
+	protected HandlerFactory $handler_factory;
 
 	/**
 	 * Global variables.
-	 *
-	 * @var array
 	 */
-	protected $globals = [];
+	protected array $globals = [];
 
 	/**
 	 * View composers.
-	 *
-	 * @var array
 	 */
-	protected $composers = [];
+	protected array $composers = [];
 
 	/**
 	 * Constructor.
@@ -73,7 +63,7 @@ class ViewService {
 	 *
 	 * @return array
 	 */
-	public function getGlobals() {
+	public function getGlobals(): array {
 		return $this->globals;
 	}
 
@@ -84,7 +74,7 @@ class ViewService {
 	 * @param  mixed  $value
 	 * @return void
 	 */
-	public function addGlobal( $key, $value ) {
+	public function addGlobal( string $key, mixed $value ): void {
 		$this->globals[ $key ] = $value;
 	}
 
@@ -94,7 +84,7 @@ class ViewService {
 	 * @param  array $globals
 	 * @return void
 	 */
-	public function addGlobals( $globals ) {
+	public function addGlobals( array $globals ): void {
 		foreach ( $globals as $key => $value ) {
 			$this->addGlobal( $key, $value );
 		}
@@ -106,7 +96,7 @@ class ViewService {
 	 * @param  string    $view
 	 * @return Handler[]
 	 */
-	public function getComposersForView( $view ) {
+	public function getComposersForView( string $view ): array {
 		$view = $this->engine->canonical( $view );
 
 		$composers = [];
@@ -127,7 +117,7 @@ class ViewService {
 	 * @param  string|Closure  $composer
 	 * @return void
 	 */
-	public function addComposer( $views, $composer ) {
+	public function addComposer( string|array $views, string|Closure $composer ): void {
 		$views = array_map( function ( $view ) {
 			return $this->engine->canonical( $view );
 		}, MixedType::toArray( $views ) );
@@ -146,7 +136,7 @@ class ViewService {
 	 * @param  ViewInterface $view
 	 * @return void
 	 */
-	public function compose( ViewInterface $view ) {
+	public function compose( ViewInterface $view ): void {
 		$global = ['global' => $this->getGlobals()];
 		$local = $view->getContext();
 
@@ -166,7 +156,7 @@ class ViewService {
 	 * @param  string  $view
 	 * @return boolean
 	 */
-	public function exists( $view ) {
+	public function exists( string $view ): bool {
 		return $this->engine->exists( $view );
 	}
 
@@ -176,7 +166,7 @@ class ViewService {
 	 * @param  string $view
 	 * @return string
 	 */
-	public function canonical( $view ) {
+	public function canonical( string $view ): string {
 		return $this->engine->canonical( $view );
 	}
 
@@ -186,7 +176,7 @@ class ViewService {
 	 * @param  string|string[] $views
 	 * @return ViewInterface
 	 */
-	public function make( $views ) {
+	public function make( string|array $views ): ViewInterface {
 		return $this->engine->make( MixedType::toArray( $views ) );
 	}
 
@@ -197,7 +187,7 @@ class ViewService {
 	 * @param  string $name
 	 * @return void
 	 */
-	public function triggerPartialHooks( $name ) {
+	public function triggerPartialHooks( string $name ): void {
 		if ( ! function_exists( 'apply_filters' ) ) {
 			// We are not in a WordPress environment - skip triggering hooks.
 			return;
@@ -220,7 +210,7 @@ class ViewService {
 	 * @param  array<string, mixed> $context
 	 * @return void
 	 */
-	public function render( $views, $context = [] ) {
+	public function render( string|array $views, array $context = [] ): void {
 		$view = $this->make( $views )->with( $context );
 		$this->triggerPartialHooks( $view->getName() );
 		echo $view->toString();

@@ -17,7 +17,7 @@ class Arr {
 	 * @param  mixed  $value
 	 * @return bool
 	 */
-	public static function accessible($value)
+	public static function accessible( mixed $value ): bool
 	{
 		return \is_array($value) || $value instanceof ArrayAccess;
 	}
@@ -30,9 +30,9 @@ class Arr {
 	 * @param  mixed   $value
 	 * @return array
 	 */
-	public static function add($array, $key, $value)
+	public static function add( array $array, string $key, mixed $value ): array
 	{
-		if (\is_null(static::get($array, $key))) {
+		if (static::get($array, $key) === null) {
 			static::set($array, $key, $value);
 		}
 
@@ -45,7 +45,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return array
 	 */
-	public static function collapse($array)
+	public static function collapse( array $array ): array
 	{
 		$results = [];
 		foreach ($array as $values) {
@@ -63,7 +63,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return array
 	 */
-	public static function divide($array)
+	public static function divide( array $array ): array
 	{
 		return [\array_keys($array), \array_values($array)];
 	}
@@ -75,7 +75,7 @@ class Arr {
 	 * @param  string  $prepend
 	 * @return array
 	 */
-	public static function dot($array, $prepend = '')
+	public static function dot( array $array, string $prepend = '' ): array
 	{
 		$results = [];
 
@@ -97,7 +97,7 @@ class Arr {
 	 * @param  array|string  $keys
 	 * @return array
 	 */
-	public static function except($array, $keys)
+	public static function except( array $array, array|string $keys ): array
 	{
 		static::forget($array, $keys);
 
@@ -111,7 +111,7 @@ class Arr {
 	 * @param  string|int  $key
 	 * @return bool
 	 */
-	public static function exists($array, $key)
+	public static function exists( ArrayAccess|array $array, string|int $key ): bool
 	{
 		if ($array instanceof ArrayAccess) {
 			return $array->offsetExists($key);
@@ -128,9 +128,9 @@ class Arr {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public static function first($array, $callback = null, $default = null)
+	public static function first( array $array, ?callable $callback = null, mixed $default = null ): mixed
 	{
-		if (\is_null($callback)) {
+		if ($callback === null) {
 			if (empty($array)) {
 				return $default;
 			}
@@ -157,9 +157,9 @@ class Arr {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public static function last($array, $callback = null, $default = null)
+	public static function last( array $array, ?callable $callback = null, mixed $default = null ): mixed
 	{
-		if (\is_null($callback)) {
+		if ($callback === null) {
 			return empty($array) ? $default : \end($array);
 		}
 
@@ -173,7 +173,7 @@ class Arr {
 	 * @param  array|string  $keys
 	 * @return void
 	 */
-	public static function forget(&$array, $keys)
+	public static function forget( array &$array, array|string $keys ): void
 	{
 		$original = &$array;
 
@@ -218,13 +218,13 @@ class Arr {
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	public static function get($array, $key, $default = null)
+	public static function get( mixed $array, string $key = '', mixed $default = null ): mixed
 	{
 		if (! static::accessible($array)) {
 			return $default;
 		}
 
-		if (\is_null($key)) {
+		if ($key === null) {
 			return $array;
 		}
 
@@ -250,9 +250,9 @@ class Arr {
 	 * @param  string|array  $keys
 	 * @return bool
 	 */
-	public static function has($array, $keys)
+	public static function has( ArrayAccess|array $array, string|array $keys ): bool
 	{
-		if (\is_null($keys)) {
+		if ($keys === null) {
 			return false;
 		}
 
@@ -293,7 +293,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return bool
 	 */
-	public static function isAssoc(array $array)
+	public static function isAssoc( array $array ): bool
 	{
 		$keys = \array_keys($array);
 
@@ -307,7 +307,7 @@ class Arr {
 	 * @param  array|string  $keys
 	 * @return array
 	 */
-	public static function only($array, $keys)
+	public static function only( array $array, array|string $keys ): array
 	{
 		return \array_intersect_key($array, \array_flip((array) $keys));
 	}
@@ -320,11 +320,11 @@ class Arr {
 	 * @param  string|array|null  $key
 	 * @return array
 	 */
-	public static function pluck($array, $value, $key = null)
+	public static function pluck( array $array, string|array $value, string|array|null $key = null ): array
 	{
 		$results = [];
 
-		list($value, $key) = static::explodePluckParameters($value, $key);
+		[$value, $key] = static::explodePluckParameters($value, $key);
 
 		foreach ($array as $item) {
 			$itemValue = static::data_get($item, $value);
@@ -332,7 +332,7 @@ class Arr {
 			// If the key is "null", we will just append the value to the array and keep
 			// looping. Otherwise we will key the array using the value of the key we
 			// received from the developer. Then we'll return the final array form.
-			if (\is_null($key)) {
+			if ($key === null) {
 				$results[] = $itemValue;
 			} else {
 				$itemKey = static::data_get($item, $key);
@@ -351,11 +351,11 @@ class Arr {
 	 * @param  string|array|null  $key
 	 * @return array
 	 */
-	protected static function explodePluckParameters($value, $key)
+	protected static function explodePluckParameters( string|array $value, string|array|null $key ): array
 	{
 		$value = \is_string($value) ? \explode('.', $value) : $value;
 
-		$key = \is_null($key) || \is_array($key) ? $key : \explode('.', $key);
+		$key = $key === null || \is_array($key) ? $key : \explode('.', $key);
 
 		return [$value, $key];
 	}
@@ -368,9 +368,9 @@ class Arr {
 	 * @param  mixed  $key
 	 * @return array
 	 */
-	public static function prepend($array, $value, $key = null)
+	public static function prepend( array $array, mixed $value, mixed $key = null ): array
 	{
-		if (\is_null($key)) {
+		if ($key === null) {
 			\array_unshift($array, $value);
 		} else {
 			$array = [$key => $value] + $array;
@@ -387,7 +387,7 @@ class Arr {
 	 * @param  mixed   $default
 	 * @return mixed
 	 */
-	public static function pull(&$array, $key, $default = null)
+	public static function pull( array &$array, string $key, mixed $default = null ): mixed
 	{
 		$value = static::get($array, $key, $default);
 
@@ -406,9 +406,9 @@ class Arr {
 	 * @param  mixed   $value
 	 * @return array
 	 */
-	public static function set(&$array, $key, $value)
+	public static function set( array &$array, string $key, mixed $value ): array
 	{
-		if (\is_null($key)) {
+		if ($key === null) {
 			return $array = $value;
 		}
 
@@ -438,7 +438,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return array
 	 */
-	public static function shuffle($array)
+	public static function shuffle( array $array ): array
 	{
 		\shuffle($array);
 
@@ -451,7 +451,7 @@ class Arr {
 	 * @param  array  $array
 	 * @return array
 	 */
-	public static function sortRecursive($array)
+	public static function sortRecursive( array $array ): array
 	{
 		foreach ($array as &$value) {
 			if (\is_array($value)) {
@@ -476,13 +476,13 @@ class Arr {
 	 * @param  mixed         $default
 	 * @return mixed
 	 */
-	public static function data_get($target, $key, $default = null)
+	public static function data_get( mixed $target, string|array $key, mixed $default = null ): mixed
 	{
-		if (\is_null($key)) {
+		if ($key === null) {
 			return $target;
 		}
 		$key = \is_array($key) ? $key : \explode('.', $key);
-		while (! \is_null($segment = \array_shift($key))) {
+		while (($segment = \array_shift($key)) !== null) {
 			if ($segment === '*') {
 				if (! \is_array($target)) {
 					return $default;

@@ -19,8 +19,7 @@ class Arguments {
 	 *
 	 * @return array
 	 */
-	public static function flip() {
-		$arguments = func_get_args();
+	public static function flip( mixed ...$arguments ): array {
 		$first_null = array_search( null, $arguments, true );
 
 		if ( $first_null === false ) {
@@ -30,10 +29,10 @@ class Arguments {
 		// Support integer keys only.
 		$first_null = (int) $first_null;
 
-		$arguments = array_values( array_merge(
-			array_slice( $arguments, $first_null ),
-			array_slice( $arguments, 0, $first_null )
-		) );
+		$arguments = array_values( [
+			...array_slice( $arguments, $first_null ),
+			...array_slice( $arguments, 0, $first_null ),
+		] );
 
 		return $arguments;
 	}

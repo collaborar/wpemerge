@@ -66,10 +66,10 @@ trait LoadsServiceProvidersTrait {
 	 */
 	protected function loadServiceProviders( Container $container ): void {
 		$config     = $container->get( Configuration::class );
-		$providers  = array_merge(
-			$this->service_providers,
-			$config->get( 'providers', [] )
-		);
+		$providers  = [
+			...$this->service_providers,
+			...$config->get( 'providers', [] ),
+		];
 
 		foreach ( $providers as $providerClass ) {
 			if ( ! is_subclass_of( $providerClass, AbstractServiceProvider::class ) ) {

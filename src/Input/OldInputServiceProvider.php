@@ -21,13 +21,13 @@ use WPEmerge\Flash\Flash;
  */
 class OldInputServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-	public function provides(string $id): bool {
-		return in_array($id, [OldInput::class, OldInputMiddleware::class], true);
+	public function provides( string $id ): bool {
+		return in_array( $id, [OldInput::class, OldInputMiddleware::class], true );
 	}
 
 	public function boot(): void {
-		$app = $this->getContainer()->get(Application::class);
-		$app->alias('oldInput', OldInput::class);
+		$app = $this->getContainer()->get( Application::class );
+		$app->alias( 'oldInput', OldInput::class );
 	}
 
 	public function register(): void {

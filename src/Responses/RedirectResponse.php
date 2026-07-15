@@ -19,10 +19,8 @@ use WPEmerge\Requests\RequestInterface;
 class RedirectResponse extends Psr7Response {
 	/**
 	 * Current request.
-	 *
-	 * @var RequestInterface
 	 */
-	protected $request = null;
+	protected RequestInterface $request;
 
 	/**
 	 * Constructor.
@@ -42,7 +40,7 @@ class RedirectResponse extends Psr7Response {
 	 * @param  integer           $status
 	 * @return ResponseInterface
 	 */
-	public function to( $url, $status = 302 ) {
+	public function to( string $url, int $status = 302 ): ResponseInterface {
 		return $this
 			->withHeader( 'Location', $url )
 			->withStatus( $status );
@@ -55,7 +53,7 @@ class RedirectResponse extends Psr7Response {
 	 * @param  integer           $status
 	 * @return ResponseInterface
 	 */
-	public function back( $fallback = '', $status = 302 ) {
+	public function back( ?string $fallback = null, int $status = 302 ): ResponseInterface {
 		$url = $this->request->getHeaderLine( 'Referer' );
 
 		if ( empty( $url ) ) {

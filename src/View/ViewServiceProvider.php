@@ -45,12 +45,12 @@ class ViewServiceProvider extends AbstractServiceProvider implements BootableSer
 		$app = $this->getContainer()->get( Application::class );
 		$app->alias( 'views', ViewService::class );
 
-		$app->alias( 'view', function () use ( $app ) {
-			return call_user_func_array( [$app->views(), 'make'], func_get_args() );
+		$app->alias( 'view', function ( ...$args ) use ( $app ) {
+			return $app->views()->make( ...$args );
 		} );
 
-		$app->alias( 'render', function () use ( $app ) {
-			return call_user_func_array( [$app->views(), 'render'], func_get_args() );
+		$app->alias( 'render', function ( ...$args ) use ( $app ) {
+			return $app->views()->render( ...$args );
 		} );
 
 		$app->alias( 'layoutContent', function () use ( $app ) {

@@ -20,7 +20,7 @@ trait HasAttributesTrait {
 	 *
 	 * @var array<string, mixed>
 	 */
-	protected $attributes = [];
+	protected array $attributes = [];
 
 	/**
 	 * Get attribute.
@@ -50,10 +50,10 @@ trait HasAttributesTrait {
 	 * @return void
 	 */
 	public function setAttribute( string $attribute, mixed $value ): void {
-		$this->setAttributes( array_merge(
-			$this->getAttributes(),
-			[$attribute => $value]
-		) );
+		$this->setAttributes( [
+			...$this->getAttributes(),
+			$attribute => $value,
+		] );
 	}
 
 	/**

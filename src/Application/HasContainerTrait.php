@@ -17,8 +17,6 @@ use League\Container\Container;
 trait HasContainerTrait {
 	/**
 	 * IoC container.
-	 *
-	 * @var Container|null
 	 */
 	protected ?Container $container = null;
 

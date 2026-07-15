@@ -17,10 +17,8 @@ use Closure;
 class ClosureFactory {
 	/**
 	 * Factory.
-	 *
-	 * @var GenericFactory
 	 */
-	protected $factory = null;
+	protected GenericFactory $factory;
 
 	/**
 	 * Constructor.
@@ -38,7 +36,7 @@ class ClosureFactory {
 	 * @param  string $key
 	 * @return Closure
 	 */
-	public function value( $key ) {
+	public function value( string $key ): Closure {
 		return function () use ( $key ) {
 			return $this->factory->make( $key );
 		};
@@ -54,12 +52,9 @@ class ClosureFactory {
 	 * @param  string $method
 	 * @return Closure
 	 */
-	public function method( $key, $method ) {
-		return function () use ( $key, $method ) {
-			return call_user_func_array(
-				[$this->factory->make( $key ), $method],
-				func_get_args()
-			);
+	public function method( string $key, string $method ): Closure {
+		return function ( ...$args ) use ( $key, $method ) {
+			return $this->factory->make( $key )->{$method}( ...$args );
 		};
 	}
 }

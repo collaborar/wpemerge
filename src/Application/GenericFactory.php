@@ -19,8 +19,6 @@ use WPEmerge\Exceptions\ClassNotFoundException;
 class GenericFactory {
 	/**
 	 * Container.
-	 *
-	 * @var ContainerInterface
 	 */
 	protected ContainerInterface $container;
 
@@ -41,7 +39,7 @@ class GenericFactory {
 	 * @param  string $class
 	 * @return object
 	 */
-	public function make( string $class ): object {
+	public function make( string $class ): mixed {
 		if ( $this->container->has( $class ) ) {
 			return $this->container->get( $class );
 		}

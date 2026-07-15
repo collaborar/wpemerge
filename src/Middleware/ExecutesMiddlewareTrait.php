@@ -33,7 +33,7 @@ trait ExecutesMiddlewareTrait {
 	 * @param  Closure           $next
 	 * @return ResponseInterface
 	 */
-	protected function executeMiddleware( $middleware, RequestInterface $request, Closure $next ) {
+	protected function executeMiddleware( array $middleware, RequestInterface $request, Closure $next ): ResponseInterface {
 		$top_middleware = array_shift( $middleware );
 
 		if ( $top_middleware === null ) {
@@ -45,11 +45,12 @@ trait ExecutesMiddlewareTrait {
 		};
 
 		$instance = $this->makeMiddleware( $top_middleware[0] );
-		$arguments = array_merge(
-			[$request, $top_middleware_next],
-			array_slice( $top_middleware, 1 )
-		);
+		$arguments = [
+			$request,
+			$top_middleware_next,
+			...array_slice( $top_middleware, 1 ),
+		];
 
-		return call_user_func_array( [$instance, 'handle'], $arguments );
+		return $instance->handle( ...$arguments );
 	}
 }

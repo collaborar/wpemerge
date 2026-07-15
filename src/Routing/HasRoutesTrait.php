@@ -21,7 +21,7 @@ trait HasRoutesTrait {
 	 *
 	 * @var RouteInterface[]
 	 */
-	protected $routes = [];
+	protected array $routes = [];
 
 	/**
 	 * Get routes.

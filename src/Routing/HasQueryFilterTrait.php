@@ -56,12 +56,9 @@ trait HasQueryFilterTrait {
 			);
 		}
 
-		return call_user_func_array(
-			$query,
-			array_merge(
-				[$query_vars],
-				array_values( $condition->getArguments( $request ) )
-			)
+		return $query(
+			$query_vars,
+			...array_values( $condition->getArguments( $request ) )
 		);
 	}
 }

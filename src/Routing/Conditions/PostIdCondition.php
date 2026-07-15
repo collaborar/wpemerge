@@ -19,10 +19,8 @@ use WPEmerge\Requests\RequestInterface;
 class PostIdCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * Post id to check against
-	 *
-	 * @var integer
 	 */
-	protected $post_id = 0;
+	protected int $post_id = 0;
 
 	/**
 	 * Constructor
@@ -30,7 +28,7 @@ class PostIdCondition implements ConditionInterface, UrlableInterface {
 	 * @codeCoverageIgnore
 	 * @param integer $post_id
 	 */
-	public function __construct( $post_id ) {
+	public function __construct( int $post_id ) {
 		$this->post_id = (int) $post_id;
 	}
 

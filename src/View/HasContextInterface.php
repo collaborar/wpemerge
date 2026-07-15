@@ -26,5 +26,5 @@ interface HasContextInterface {
 	 * @param  mixed                       $value
 	 * @return static                      $this
 	 */
-	public function with( string|array $key, mixed $value = null ): static;
+	public function with( string|array|null $key, mixed $value = null ): static;
 }

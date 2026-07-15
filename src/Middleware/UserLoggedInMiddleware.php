@@ -10,6 +10,7 @@
 namespace WPEmerge\Middleware;
 
 use Closure;
+use Psr\Http\Message\ResponseInterface;
 use WPEmerge\Requests\RequestInterface;
 use WPEmerge\Responses\ResponseService;
 
@@ -19,10 +20,8 @@ use WPEmerge\Responses\ResponseService;
 class UserLoggedInMiddleware {
 	/**
 	 * Response service.
-	 *
-	 * @var ResponseService
 	 */
-	protected $response_service = null;
+	protected ResponseService $response_service;
 
 	/**
 	 * Constructor.
@@ -37,7 +36,7 @@ class UserLoggedInMiddleware {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function handle( RequestInterface $request, Closure $next, $url = '' ) {
+	public function handle( RequestInterface $request, Closure $next, string $url = '' ) {
 		if ( is_user_logged_in() ) {
 			return $next( $request );
 		}

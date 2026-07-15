@@ -22,17 +22,13 @@ use WPEmerge\View\ViewService;
 class ResponseService {
 	/**
 	 * Current request.
-	 *
-	 * @var RequestInterface
 	 */
-	protected $request = null;
+	protected RequestInterface $request;
 
 	/**
 	 * View service.
-	 *
-	 * @var ViewService
 	 */
-	protected $view_service = null;
+	protected ViewService $view_service;
 
 	/**
 	 * Constructor.
@@ -54,7 +50,7 @@ class ResponseService {
 	 * @param  ResponseInterface $response
 	 * @return void
 	 */
-	public function respond( ResponseInterface $response ) {
+	public function respond( ResponseInterface $response ): void {
 		if ( ! headers_sent() ) {
 			$this->sendHeaders( $response );
 		}
@@ -68,7 +64,7 @@ class ResponseService {
 	 * @param  ResponseInterface $response
 	 * @return void
 	 */
-	public function sendHeaders( ResponseInterface $response ) {
+	public function sendHeaders( ResponseInterface $response ): void {
 		// Status
 		header( sprintf(
 			'HTTP/%s %s %s',
@@ -92,7 +88,7 @@ class ResponseService {
 	 * @param  ResponseInterface $response
 	 * @return StreamInterface
 	 */
-	protected function getBody( ResponseInterface $response ) {
+	protected function getBody( ResponseInterface $response ): StreamInterface {
 		$body = $response->getBody();
 		if ( $body->isSeekable() ) {
 			$body->rewind();
@@ -107,7 +103,7 @@ class ResponseService {
 	 * @param  ResponseInterface $response
 	 * @return integer
 	 */
-	protected function getBodyContentLength( ResponseInterface $response ) {
+	protected function getBodyContentLength( ResponseInterface $response ): int {
 		$content_length = $response->getHeaderLine( 'Content-Length' );
 
 		if ( ! $content_length ) {
@@ -130,7 +126,7 @@ class ResponseService {
 	 * @param  integer           $chunk_size
 	 * @return void
 	 */
-	public function sendBody( ResponseInterface $response, $chunk_size = 4096 ) {
+	public function sendBody( ResponseInterface $response, int $chunk_size = 4096 ): void {
 		$body = $this->getBody( $response );
 		$content_length = $this->getBodyContentLength( $response );
 
@@ -149,7 +145,7 @@ class ResponseService {
 	 * @param  integer         $chunk_size
 	 * @return void
 	 */
-	protected function sendBodyWithoutLength( StreamInterface $body, $chunk_size ) {
+	protected function sendBodyWithoutLength( StreamInterface $body, int $chunk_size ): void {
 		while ( connection_status() === CONNECTION_NORMAL && ! $body->eof() ) {
 			echo $body->read( $chunk_size );
 		}
@@ -164,7 +160,7 @@ class ResponseService {
 	 * @param  integer         $chunk_size
 	 * @return void
 	 */
-	protected function sendBodyWithLength( StreamInterface $body, $length, $chunk_size ) {
+	protected function sendBodyWithLength( StreamInterface $body, int $length, int $chunk_size ): void {
 		$content_left = $length;
 
 		while ( connection_status() === CONNECTION_NORMAL && $content_left > 0 ) {
@@ -185,7 +181,7 @@ class ResponseService {
 	 *
 	 * @return ResponseInterface
 	 */
-	public function response() {
+	public function response(): ResponseInterface {
 		return new Psr7Response();
 	}
 
@@ -195,7 +191,7 @@ class ResponseService {
 	 * @param  string            $output
 	 * @return ResponseInterface
 	 */
-	public function output( $output ) {
+	public function output( string $output ): ResponseInterface {
 		$response = $this->response();
 		$response = $response->withBody( Psr7\Utils::streamFor( $output ) );
 		return $response;
@@ -207,7 +203,7 @@ class ResponseService {
 	 * @param  mixed             $data
 	 * @return ResponseInterface
 	 */
-	public function json( $data ) {
+	public function json( mixed $data ): ResponseInterface {
 		$response = $this->response();
 		$response = $response->withHeader( 'Content-Type', 'application/json' );
 		$response = $response->withBody( Psr7\Utils::streamFor( wp_json_encode( $data ) ) );
@@ -231,16 +227,16 @@ class ResponseService {
 	 * @param  integer           $status
 	 * @return ResponseInterface
 	 */
-	public function error( $status ) {
+	public function error( int $status ): ResponseInterface {
 		$views = [$status, 'error', 'index'];
 
 		if ( is_admin() ) {
-			$views = array_merge(
-				array_map( function ( $view ) {
+			$views = [
+				...array_map( function ( $view ) {
 					return $view . '-' . ( wp_doing_ajax() ? 'ajax' : 'admin' );
 				}, $views ),
-				$views
-			);
+				...$views,
+			];
 		}
 
 		return $this->view_service->make( $views )

@@ -20,7 +20,7 @@ class MultipleCondition implements ConditionInterface {
 	 *
 	 * @var ConditionInterface[]
 	 */
-	protected $conditions = [];
+	protected array $conditions = [];
 
 	/**
 	 * Constructor.
@@ -28,7 +28,7 @@ class MultipleCondition implements ConditionInterface {
 	 * @codeCoverageIgnore
 	 * @param ConditionInterface[] $conditions
 	 */
-	public function __construct( $conditions ) {
+	public function __construct( array $conditions ) {
 		$this->conditions = $conditions;
 	}
 
@@ -38,7 +38,7 @@ class MultipleCondition implements ConditionInterface {
 	 * @codeCoverageIgnore
 	 * @return ConditionInterface[]
 	 */
-	public function getConditions() {
+	public function getConditions(): array {
 		return $this->conditions;
 	}
 
@@ -61,7 +61,7 @@ class MultipleCondition implements ConditionInterface {
 		$arguments = [];
 
 		foreach ( $this->conditions as $condition ) {
-			$arguments = array_merge( $arguments, $condition->getArguments( $request ) );
+			$arguments = [...$arguments, ...$condition->getArguments( $request )];
 		}
 
 		return $arguments;

@@ -21,24 +21,18 @@ class PhpView implements ViewInterface {
 
 	/**
 	 * PHP view engine.
-	 *
-	 * @var PhpViewEngine
 	 */
-	protected $engine = null;
+	protected PhpViewEngine $engine;
 
 	/**
 	 * Filepath to view.
-	 *
-	 * @var string
 	 */
-	protected $filepath = '';
+	protected string $filepath = '';
 
 	/**
 	 * Layout to use.
-	 *
-	 * @var ViewInterface|null
 	 */
-	protected $layout = null;
+	protected ?ViewInterface $layout = null;
 
 	/**
 	 * Constructor.
@@ -55,7 +49,7 @@ class PhpView implements ViewInterface {
 	 *
 	 * @return string
 	 */
-	public function getFilepath() {
+	public function getFilepath(): string {
 		return $this->filepath;
 	}
 
@@ -65,7 +59,7 @@ class PhpView implements ViewInterface {
 	 * @param  string $filepath
 	 * @return static $this
 	 */
-	public function setFilepath( $filepath ) {
+	public function setFilepath( string $filepath ): static {
 		$this->filepath = $filepath;
 		return $this;
 	}
@@ -75,7 +69,7 @@ class PhpView implements ViewInterface {
 	 *
 	 * @return ViewInterface|null
 	 */
-	public function getLayout() {
+	public function getLayout(): ?ViewInterface {
 		return $this->layout;
 	}
 
@@ -85,7 +79,7 @@ class PhpView implements ViewInterface {
 	 * @param  ViewInterface|null $layout
 	 * @return static             $this
 	 */
-	public function setLayout( $layout ) {
+	public function setLayout( ?ViewInterface $layout ): static {
 		$this->layout = $layout;
 		return $this;
 	}

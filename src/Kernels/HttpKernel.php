@@ -42,71 +42,51 @@ class HttpKernel implements HttpKernelInterface {
 
 	/**
 	 * Application.
-	 *
-	 * @var Application
 	 */
 	protected Application $application;
 
 	/**
 	 * Injection factory.
-	 *
-	 * @var GenericFactory
 	 */
 	protected GenericFactory $factory;
 
 	/**
 	 * Handler factory.
-	 *
-	 * @var HandlerFactory
 	 */
 	protected HandlerFactory $handler_factory;
 
 	/**
 	 * Response service.
-	 *
-	 * @var ResponseService
 	 */
 	protected ResponseService $response_service;
 
 	/**
 	 * Request.
-	 *
-	 * @var RequestInterface
 	 */
 	protected RequestInterface $request;
 
 	/**
 	 * Router.
-	 *
-	 * @var Router
 	 */
 	protected Router $router;
 
 	/**
 	 * View Service.
-	 *
-	 * @var ViewService
 	 */
 	protected ViewService $view_service;
 
 	/**
 	 * Error handler.
-	 *
-	 * @var ErrorHandlerInterface
 	 */
 	protected ErrorHandlerInterface $error_handler;
 
 	/**
 	 * Current response.
-	 *
-	 * @var ResponseInterface|null
 	 */
 	protected ?ResponseInterface $response = null;
 
 	/**
 	 * Template WordPress attempted to load.
-	 *
-	 * @var string
 	 */
 	protected string $template = '';
 
@@ -182,7 +162,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @return ResponseInterface
 	 */
 	protected function executeHandler( Handler $handler, array $arguments = [] ): ResponseInterface {
-		$response = call_user_func_array( [$handler, 'execute'], array_values( $arguments ) );
+		$response = $handler->execute( ...array_values( $arguments ) );
 		$response = $this->toResponse( $response );
 
 		if ( ! $response instanceof ResponseInterface ) {
@@ -204,7 +184,7 @@ class HttpKernel implements HttpKernelInterface {
 		try {
 			$handler = $handler instanceof Handler ? $handler : $this->handler_factory->make( $handler );
 
-			$middleware = array_merge( $middleware, $this->getHandlerMiddleware( $handler ) );
+			$middleware = [...$middleware, ...$this->getHandlerMiddleware( $handler )];
 			$middleware = $this->expandMiddleware( $middleware );
 			$middleware = $this->uniqueMiddleware( $middleware );
 			$middleware = $this->sortMiddleware( $middleware );
@@ -241,11 +221,7 @@ class HttpKernel implements HttpKernelInterface {
 			$request,
 			$route->getAttribute( 'middleware', [] ),
 			$route->getAttribute( 'handler' ),
-			array_merge(
-				[$request],
-				$arguments,
-				$route_arguments
-			)
+			[$request, ...$arguments, ...$route_arguments]
 		);
 
 		$this->response = $response;

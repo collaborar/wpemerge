@@ -19,10 +19,8 @@ use WPEmerge\Requests\RequestInterface;
 class CsrfMiddleware {
 	/**
 	 * CSRF service.
-	 *
-	 * @var Csrf
 	 */
-	protected $csrf = null;
+	protected Csrf $csrf;
 
 	/**
 	 * Constructor.
@@ -42,7 +40,7 @@ class CsrfMiddleware {
 	 * @return ResponseInterface
 	 * @throws InvalidCsrfTokenException
 	 */
-	public function handle( RequestInterface $request, Closure $next, $action = -1 ) {
+	public function handle( RequestInterface $request, Closure $next, int|string $action = -1 ): ResponseInterface {
 		if ( ! $request->isReadVerb() ) {
 			$token = $this->csrf->getTokenFromRequest( $request );
 			if ( ! $this->csrf->isValidToken( $token, $action ) ) {

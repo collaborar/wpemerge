@@ -19,17 +19,15 @@ use WPEmerge\Requests\RequestInterface;
 class PostTemplateCondition implements ConditionInterface {
 	/**
 	 * Post template to check against
-	 *
-	 * @var string
 	 */
-	protected $post_template = '';
+	protected string $post_template = '';
 
 	/**
 	 * Post types to check against
 	 *
 	 * @var string[]
 	 */
-	protected $post_types = [];
+	protected array $post_types = [];
 
 	/**
 	 * Constructor
@@ -38,7 +36,7 @@ class PostTemplateCondition implements ConditionInterface {
 	 * @param string          $post_template
 	 * @param string|string[] $post_types
 	 */
-	public function __construct( $post_template, $post_types = [] ) {
+	public function __construct( string $post_template, string|array $post_types = [] ) {
 		$this->post_template = $post_template;
 		$this->post_types = is_array( $post_types ) ? $post_types : [$post_types];
 	}

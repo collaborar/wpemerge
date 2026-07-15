@@ -19,17 +19,15 @@ use WPEmerge\Exceptions\ConfigurationException;
 trait ApplicationTrait {
 	/**
 	 * Application instance.
-	 *
-	 * @var Application|null
 	 */
-	public static $instance = null;
+	public static ?Application $instance = null;
 
 	/**
 	 * Make and assign a new application instance.
 	 *
 	 * @return Application
 	 */
-	public static function make() {
+	public static function make(): Application {
 		static::setApplication( Application::make() );
 
 		return static::getApplication();
@@ -41,7 +39,7 @@ trait ApplicationTrait {
 	 * @codeCoverageIgnore
 	 * @return Application|null
 	 */
-	public static function getApplication() {
+	public static function getApplication(): ?Application {
 		return static::$instance;
 	}
 
@@ -52,7 +50,7 @@ trait ApplicationTrait {
 	 * @param  Application|null $application
 	 * @return void
 	 */
-	public static function setApplication( $application ) {
+	public static function setApplication( ?Application $application ): void {
 		static::$instance = $application;
 	}
 
@@ -63,7 +61,7 @@ trait ApplicationTrait {
 	 * @param  array  $parameters
 	 * @return mixed
 	 */
-	public static function __callStatic( $method, $parameters ) {
+	public static function __callStatic( string $method, array $parameters ): mixed {
 		$application = static::getApplication();
 
 		if ( ! $application ) {
@@ -73,6 +71,6 @@ trait ApplicationTrait {
 			);
 		}
 
-		return call_user_func_array( [$application, $method], $parameters );
+		return $application->{$method}( ...$parameters );
 	}
 }

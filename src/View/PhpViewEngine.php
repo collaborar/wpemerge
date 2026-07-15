@@ -15,31 +15,27 @@ namespace WPEmerge\View;
 class PhpViewEngine implements ViewEngineInterface {
 	/**
 	 * Name of view file header based on which to resolve layouts.
-	 *
-	 * @var string
 	 */
-	protected $layout_file_header = 'Layout';
+	protected string $layout_file_header = 'Layout';
 
 	/**
 	 * View compose action.
 	 *
 	 * @var callable
 	 */
-	protected $compose = null;
+	protected $compose;
 
 	/**
 	 * View finder.
-	 *
-	 * @var PhpViewFilesystemFinder
 	 */
-	protected $finder = null;
+	protected PhpViewFilesystemFinder $finder;
 
 	/**
 	 * Stack of views ready to be rendered.
 	 *
 	 * @var PhpView[]
 	 */
-	protected $layout_content_stack = [];
+	protected array $layout_content_stack = [];
 
 	/**
 	 * Constructor.
@@ -90,7 +86,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * @return ViewInterface
 	 * @throws ViewNotFoundException
 	 */
-	protected function makeView( $name, $filepath ) {
+	protected function makeView( string $name, string $filepath ): ViewInterface {
 		$view = (new PhpView( $this ))
 			->setName( $name )
 			->setFilepath( $filepath );
@@ -111,7 +107,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * @return ViewInterface|null
 	 * @throws ViewNotFoundException
 	 */
-	protected function getViewLayout( PhpView $view ) {
+	protected function getViewLayout( PhpView $view ): ?ViewInterface {
 		$layout_headers = array_filter( get_file_data(
 			$view->getFilepath(),
 			[$this->layout_file_header]
@@ -136,7 +132,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * @param  PhpView $__view
 	 * @return string
 	 */
-	protected function renderView( PhpView $__view ) {
+	protected function renderView( PhpView $__view ): string {
 		$__context = $__view->getContext();
 		ob_start();
 		extract( $__context, EXTR_OVERWRITE );
@@ -152,7 +148,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * @param PhpView $view
 	 * @return void
 	 */
-	public function pushLayoutContent( PhpView $view ) {
+	public function pushLayoutContent( PhpView $view ): void {
 		$this->layout_content_stack[] = $view;
 	}
 
@@ -162,7 +158,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * @codeCoverageIgnore
 	 * @return PhpView|null
 	 */
-	public function popLayoutContent() {
+	public function popLayoutContent(): ?PhpView {
 		return array_pop( $this->layout_content_stack );
 	}
 
@@ -172,7 +168,7 @@ class PhpViewEngine implements ViewEngineInterface {
 	 * @codeCoverageIgnore
 	 * @return string
 	 */
-	public function getLayoutContent() {
+	public function getLayoutContent(): string {
 		$view = $this->popLayoutContent();
 
 		if ( ! $view ) {
