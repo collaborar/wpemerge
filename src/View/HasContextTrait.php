@@ -14,10 +14,8 @@ use WPEmerge\Support\Arr;
 trait HasContextTrait {
 	/**
 	 * Context.
-	 *
-	 * @var array
 	 */
-	protected $context = [];
+	protected array $context = [];
 
 	/**
 	 * Get context values.
@@ -26,7 +24,7 @@ trait HasContextTrait {
 	 * @param  mixed|null  $default
 	 * @return mixed
 	 */
-	public function getContext( $key = null, $default = null ) {
+	public function getContext( ?string $key = null, mixed $default = null ): mixed {
 		if ( $key === null ) {
 			return $this->context;
 		}
@@ -41,9 +39,9 @@ trait HasContextTrait {
 	 * @param  mixed                       $value
 	 * @return static                      $this
 	 */
-	public function with( $key, $value = null ) {
+	public function with( string|array|null $key, mixed $value = null ): static {
 		if ( is_array( $key ) ) {
-			$this->context = array_merge( $this->getContext(), $key );
+			$this->context = [...$this->getContext(), ...$key];
 		} else {
 			$this->context[ $key ] = $value;
 		}

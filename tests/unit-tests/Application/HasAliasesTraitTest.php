@@ -114,7 +114,7 @@ class HasAliasesTraitTestImplementation {
 
 	public $resolver = null;
 
-	public function resolve( $key ) {
+	public function resolve( string $key ): mixed {
 		return call_user_func_array( [$this->resolver, 'resolve'], func_get_args() );
 	}
 }

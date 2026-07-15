@@ -2,7 +2,8 @@
 
 namespace WPEmerge\Exceptions\Whoops;
 
-use Pimple\Container;
+use Psr\Container\ContainerInterface;
+use WPEmerge\Routing\Router;
 
 /**
  * Provide debug data for usage with \Whoops\Handler\PrettyPageHandler.
@@ -12,17 +13,15 @@ use Pimple\Container;
 class DebugDataProvider {
 	/**
 	 * Container.
-	 *
-	 * @var Container
 	 */
-	protected $container = null;
+	protected ContainerInterface $container;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Container $container
+	 * @param ContainerInterface $container
 	 */
-	public function __construct( $container ) {
+	public function __construct( ContainerInterface $container ) {
 		$this->container = $container;
 	}
 
@@ -32,7 +31,7 @@ class DebugDataProvider {
 	 * @param  mixed $value
 	 * @return mixed
 	 */
-	public function toScalar( $value ) {
+	public function toScalar( mixed $value ): mixed {
 		$type = gettype( $value );
 
 		if ( ! is_scalar( $value ) ) {
@@ -48,9 +47,9 @@ class DebugDataProvider {
 	 * @param \Whoops\Exception\Inspector $inspector
 	 * @return array<string, mixed>
 	 */
-	public function route( $inspector ) {
+	public function route( \Whoops\Exception\Inspector $inspector ): array {
 		/** @var \WPEmerge\Routing\RouteInterface|null $route */
-		$route = $this->container[ WPEMERGE_ROUTING_ROUTER_KEY ]->getCurrentRoute();
+		$route = $this->container->get( Router::class )->getCurrentRoute();
 
 		if ( ! $route ) {
 			return [];

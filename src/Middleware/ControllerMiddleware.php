@@ -20,21 +20,21 @@ class ControllerMiddleware {
 	 *
 	 * @var string[]
 	 */
-	protected $middleware = [];
+	protected array $middleware = [];
 
 	/**
 	 * Methods the middleware applies to.
 	 *
 	 * @var string[]
 	 */
-	protected $whitelist = [];
+	protected array $whitelist = [];
 
 	/**
 	 * Methods the middleware does not apply to.
 	 *
 	 * @var string[]
 	 */
-	protected $blacklist = [];
+	protected array $blacklist = [];
 
 	/**
 	 * Constructor.
@@ -42,7 +42,7 @@ class ControllerMiddleware {
 	 * @codeCoverageIgnore
 	 * @param  string|string[] $middleware
 	 */
-	public function __construct( $middleware ) {
+	public function __construct( string|array $middleware ) {
 		$this->middleware = (array) $middleware;
 	}
 
@@ -52,7 +52,7 @@ class ControllerMiddleware {
 	 * @codeCoverageIgnore
 	 * @return string[]
 	 */
-	public function get() {
+	public function get(): array {
 		return $this->middleware;
 	}
 
@@ -63,7 +63,7 @@ class ControllerMiddleware {
 	 * @param  string|string[] $methods
 	 * @return static
 	 */
-	public function only( $methods ) {
+	public function only( string|array $methods ): static {
 		$this->whitelist = (array) $methods;
 
 		return $this;
@@ -76,7 +76,7 @@ class ControllerMiddleware {
 	 * @param  string|string[] $methods
 	 * @return static
 	 */
-	public function except( $methods ) {
+	public function except( string|array $methods ): static {
 		$this->blacklist = (array) $methods;
 
 		return $this;
@@ -88,7 +88,7 @@ class ControllerMiddleware {
 	 * @param  string $method
 	 * @return boolean
 	 */
-	public function appliesTo( $method ) {
+	public function appliesTo( string $method ): bool {
 		if ( in_array( $method, $this->blacklist, true ) ) {
 			return false;
 		}

@@ -3,7 +3,7 @@
 namespace WPEmergeTests\Application;
 
 use Mockery;
-use Pimple\Container;
+use Psr\Container\ContainerInterface;
 use WPEmerge\Application\GenericFactory;
 use WPEmerge\Exceptions\ClassNotFoundException;
 use WPEmergeTestTools\TestCase;
@@ -13,7 +13,7 @@ use WPEmergeTestTools\TestCase;
  */
 class GenericFactoryTest extends TestCase {
 	public function set_up() {
-		$this->container = Mockery::mock( Container::class );
+		$this->container = Mockery::mock( ContainerInterface::class );
 		$this->subject = new GenericFactory( $this->container );
 	}
 
@@ -30,7 +30,7 @@ class GenericFactoryTest extends TestCase {
 	public function testMake_UnknownClass_CreateFreshInstance() {
 		$class = \WPEmergeTestTools\TestService::class;
 
-		$this->container->shouldReceive( 'offsetExists' )
+		$this->container->shouldReceive( 'has' )
 			->with( $class )
 			->andReturn( false );
 
@@ -48,7 +48,7 @@ class GenericFactoryTest extends TestCase {
 	public function testMake_UnknownNonexistentClass_Exception() {
 		$class = \WPEmergeTestTools\NonExistentClass::class;
 
-		$this->container->shouldReceive( 'offsetExists' )
+		$this->container->shouldReceive( 'has' )
 			->with( $class )
 			->andReturn( false );
 
@@ -64,12 +64,13 @@ class GenericFactoryTest extends TestCase {
 		$expected = 'foo';
 		$class = \WPEmergeTestTools\TestService::class;
 
-		$this->container->shouldReceive( 'offsetExists' )
+		$this->container->shouldReceive( 'has' )
 			->with( $class )
 			->andReturn( true );
 
-		$this->container->shouldReceive( 'offsetGet' )
-			->andReturnUsing( function ( $class ) use ( $expected ) {
+		$this->container->shouldReceive( 'get' )
+			->with( $class )
+			->andReturnUsing( function () use ( $class, $expected ) {
 				$instance = new $class();
 				$instance->setTest( $expected );
 				return $instance;

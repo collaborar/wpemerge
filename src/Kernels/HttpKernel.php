@@ -9,10 +9,11 @@
 
 namespace WPEmerge\Kernels;
 
+use Closure;
 use Exception;
-use Pimple\Container;
 use Psr\Http\Message\ResponseInterface;
 use WP_Query;
+use WPEmerge\Application\Application;
 use WPEmerge\Application\GenericFactory;
 use WPEmerge\Exceptions\ConfigurationException;
 use WPEmerge\Exceptions\ErrorHandlerInterface;
@@ -40,73 +41,60 @@ class HttpKernel implements HttpKernelInterface {
 	use ExecutesMiddlewareTrait;
 
 	/**
-	 * Container.
-	 *
-	 * @var Container
+	 * Application.
 	 */
-	protected $container = null;
+	protected Application $application;
 
 	/**
 	 * Injection factory.
-	 *
-	 * @var GenericFactory
 	 */
-	protected $factory = null;
+	protected GenericFactory $factory;
 
 	/**
 	 * Handler factory.
-	 *
-	 * @var HandlerFactory
 	 */
-	protected $handler_factory = null;
+	protected HandlerFactory $handler_factory;
 
 	/**
 	 * Response service.
-	 *
-	 * @var ResponseService
 	 */
-	protected $response_service = null;
+	protected ResponseService $response_service;
 
 	/**
 	 * Request.
-	 *
-	 * @var RequestInterface
 	 */
-	protected $request = null;
+	protected RequestInterface $request;
 
 	/**
 	 * Router.
-	 *
-	 * @var Router
 	 */
-	protected $router = null;
+	protected Router $router;
 
 	/**
 	 * View Service.
-	 *
-	 * @var ViewService
 	 */
-	protected $view_service = null;
+	protected ViewService $view_service;
 
 	/**
 	 * Error handler.
-	 *
-	 * @var ErrorHandlerInterface
 	 */
-	protected $error_handler = null;
+	protected ErrorHandlerInterface $error_handler;
+
+	/**
+	 * Current response.
+	 */
+	protected ?ResponseInterface $response = null;
 
 	/**
 	 * Template WordPress attempted to load.
-	 *
-	 * @var string
 	 */
-	protected $template = '';
+	protected string $template = '';
 
 	/**
 	 * Constructor.
 	 *
 	 * @codeCoverageIgnore
-	 * @param Container             $container
+	 * @param Application           $application
 	 * @param GenericFactory        $factory
 	 * @param HandlerFactory        $handler_factory
 	 * @param ResponseService       $response_service
@@ -116,7 +104,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @param ErrorHandlerInterface $error_handler
 	 */
 	public function __construct(
-		Container $container,
+		Application $application,
 		GenericFactory $factory,
 		HandlerFactory $handler_factory,
 		ResponseService $response_service,
@@ -125,7 +113,7 @@ class HttpKernel implements HttpKernelInterface {
 		ViewService $view_service,
 		ErrorHandlerInterface $error_handler
 	) {
-		$this->container = $container;
+		$this->application = $application;
 		$this->factory = $factory;
 		$this->handler_factory = $handler_factory;
 		$this->response_service = $response_service;
@@ -141,8 +129,8 @@ class HttpKernel implements HttpKernelInterface {
 	 * @codeCoverageIgnore
 	 * @return ResponseInterface|null
 	 */
-	protected function getResponse() {
-		return isset( $this->container[ WPEMERGE_RESPONSE_KEY ] ) ? $this->container[ WPEMERGE_RESPONSE_KEY ] : null;
+	protected function getResponse(): ?ResponseInterface {
+		return $this->response;
 	}
 
 	/**
@@ -151,7 +139,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @codeCoverageIgnore
 	 * @return ResponseService
 	 */
-	protected function getResponseService() {
+	protected function getResponseService(): ResponseService {
 		return $this->response_service;
 	}
 
@@ -162,7 +150,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @param  string $class
 	 * @return object
 	 */
-	protected function makeMiddleware( $class ) {
+	protected function makeMiddleware( string $class ): object {
 		return $this->factory->make( $class );
 	}
 
@@ -173,8 +161,8 @@ class HttpKernel implements HttpKernelInterface {
 	 * @param  array             $arguments
 	 * @return ResponseInterface
 	 */
-	protected function executeHandler( Handler $handler, $arguments = [] ) {
-		$response = call_user_func_array( [$handler, 'execute'], array_values( $arguments ) );
+	protected function executeHandler( Handler $handler, array $arguments = [] ): ResponseInterface {
+		$response = $handler->execute( ...array_values( $arguments ) );
 		$response = $this->toResponse( $response );
 
 		if ( ! $response instanceof ResponseInterface ) {
@@ -190,13 +178,13 @@ class HttpKernel implements HttpKernelInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function run( RequestInterface $request, $middleware, $handler, $arguments = [] ) {
+	public function run( RequestInterface $request, array $middleware, string|Closure|Handler $handler, array $arguments = [] ): ResponseInterface {
 		$this->error_handler->register();
 
 		try {
 			$handler = $handler instanceof Handler ? $handler : $this->handler_factory->make( $handler );
 
-			$middleware = array_merge( $middleware, $this->getHandlerMiddleware( $handler ) );
+			$middleware = [...$middleware, ...$this->getHandlerMiddleware( $handler )];
 			$middleware = $this->expandMiddleware( $middleware );
 			$middleware = $this->uniqueMiddleware( $middleware );
 			$middleware = $this->sortMiddleware( $middleware );
@@ -216,7 +204,7 @@ class HttpKernel implements HttpKernelInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function handle( RequestInterface $request, $arguments = [] ) {
+	public function handle( RequestInterface $request, array $arguments = [] ): ?ResponseInterface {
 		$route = $this->router->execute( $request );
 
 		if ( $route === null ) {
@@ -233,14 +221,10 @@ class HttpKernel implements HttpKernelInterface {
 			$request,
 			$route->getAttribute( 'middleware', [] ),
 			$route->getAttribute( 'handler' ),
-			array_merge(
-				[$request],
-				$arguments,
-				$route_arguments
-			)
+			[$request, ...$arguments, ...$route_arguments]
 		);
 
-		$this->container[ WPEMERGE_RESPONSE_KEY ] = $response;
+		$this->response = $response;
 
 		return $response;
 	}
@@ -250,7 +234,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function respond() {
+	public function respond(): void {
 		$response = $this->getResponse();
 
 		if ( ! $response instanceof ResponseInterface ) {
@@ -265,7 +249,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function compose() {
+	public function compose(): void {
 		$view = $this->view_service->make( $this->template );
 
 		echo $view->toString();
@@ -275,7 +259,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * {@inheritDoc}
 	 * @codeCoverageIgnore
 	 */
-	public function bootstrap() {
+	public function bootstrap(): void {
 		// Web. Use 3100 so it's high enough and has uncommonly used numbers
 		// before and after. For example, 1000 is too common and it would have 999 before it
 		// which is too common as well.).
@@ -295,7 +279,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @param  array $query_vars
 	 * @return array
 	 */
-	public function filterRequest( $query_vars ) {
+	public function filterRequest( array $query_vars ): array {
 		$routes = $this->router->getRoutes();
 
 		foreach ( $routes as $route ) {
@@ -307,10 +291,9 @@ class HttpKernel implements HttpKernelInterface {
 				continue;
 			}
 
-			$this->container[ WPEMERGE_APPLICATION_KEY ]
-				->renderConfigExceptions( function () use ( $route, &$query_vars ) {
-					$query_vars = $route->applyQueryFilter( $this->request, $query_vars );
-				} );
+			$this->application->renderConfigExceptions( function () use ( $route, &$query_vars ) {
+				$query_vars = $route->applyQueryFilter( $this->request, $query_vars );
+			} );
 			break;
 		}
 
@@ -323,7 +306,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @param  string $template
 	 * @return string
 	 */
-	public function filterTemplateInclude( $template ) {
+	public function filterTemplateInclude( string $template ): string {
 		/** @var WP_Query $wp_query */
 		global $wp_query;
 
@@ -359,7 +342,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function registerAjaxAction() {
+	public function registerAjaxAction(): void {
 		if ( ! wp_doing_ajax() ) {
 			return;
 		}
@@ -376,7 +359,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function actionAjax() {
+	public function actionAjax(): void {
 		$response = $this->handle( $this->request, [''] );
 
 		if ( ! $response instanceof ResponseInterface ) {
@@ -394,7 +377,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return string
 	 */
-	protected function getAdminPageHook() {
+	protected function getAdminPageHook(): string {
 		global $pagenow, $typenow, $plugin_page;
 
 		$page_hook = '';
@@ -419,7 +402,7 @@ class HttpKernel implements HttpKernelInterface {
 	 * @param  string $page_hook
 	 * @return string
 	 */
-	protected function getAdminHook( $page_hook ) {
+	protected function getAdminHook( string $page_hook ): string {
 		global $pagenow, $plugin_page;
 
 		if ( ! empty( $page_hook ) ) {
@@ -442,7 +425,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function registerAdminAction() {
+	public function registerAdminAction(): void {
 		$page_hook = $this->getAdminPageHook();
 		$hook_suffix = $this->getAdminHook( $page_hook );
 
@@ -455,7 +438,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function actionAdminLoad() {
+	public function actionAdminLoad(): void {
 		$response = $this->handle( $this->request, [''] );
 
 		if ( ! $response instanceof ResponseInterface ) {
@@ -472,7 +455,7 @@ class HttpKernel implements HttpKernelInterface {
 	 *
 	 * @return void
 	 */
-	public function actionAdmin() {
+	public function actionAdmin(): void {
 		$response = $this->getResponse();
 
 		if ( ! $response instanceof ResponseInterface ) {

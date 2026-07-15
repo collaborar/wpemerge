@@ -9,35 +9,28 @@
 
 namespace WPEmerge\Middleware;
 
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use WPEmerge\Responses\ResponseService;
 
 /**
  * Provide middleware dependencies.
  *
  * @codeCoverageIgnore
  */
-class MiddlewareServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ UserLoggedOutMiddleware::class ] = function ( $c ) {
-			return new UserLoggedOutMiddleware( $c[ WPEMERGE_RESPONSE_SERVICE_KEY ] );
-		};
+class MiddlewareServiceProvider extends AbstractServiceProvider {
 
-		$container[ UserLoggedInMiddleware::class ] = function ( $c ) {
-			return new UserLoggedInMiddleware( $c[ WPEMERGE_RESPONSE_SERVICE_KEY ] );
-		};
-
-		$container[ UserCanMiddleware::class ] = function ( $c ) {
-			return new UserCanMiddleware( $c[ WPEMERGE_RESPONSE_SERVICE_KEY ] );
-		};
+	public function provides( string $id ): bool {
+		return in_array( $id, [
+			UserLoggedInMiddleware::class,
+			UserLoggedOutMiddleware::class,
+			UserCanMiddleware::class,
+		], true );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function register(): void {
+		$c = $this->getContainer();
+		$c->addShared( UserLoggedInMiddleware::class )->addArguments( [ ResponseService::class ] );
+		$c->addShared( UserLoggedOutMiddleware::class )->addArguments( [ ResponseService::class ] );
+		$c->addShared( UserCanMiddleware::class )->addArguments( [ ResponseService::class ] );
 	}
 }

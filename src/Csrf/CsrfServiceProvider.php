@@ -9,34 +9,29 @@
 
 namespace WPEmerge\Csrf;
 
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use WPEmerge\Application\Application;
 
 /**
  * Provide CSRF dependencies.
  *
  * @codeCoverageIgnore
  */
-class CsrfServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ WPEMERGE_CSRF_KEY ] = function () {
-			return new Csrf();
-		};
+class CsrfServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-		$container[ CsrfMiddleware::class ] = function ( $c ) {
-			return new CsrfMiddleware( $c[ WPEMERGE_CSRF_KEY ] );
-		};
-
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-		$app->alias( 'csrf', WPEMERGE_CSRF_KEY );
+	public function provides( string $id ): bool {
+		return in_array( $id, [ Csrf::class, CsrfMiddleware::class ], true );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function boot(): void {
+		$app = $this->getContainer()->get( Application::class );
+		$app->alias( 'csrf', Csrf::class );
+	}
+
+	public function register(): void {
+		$c = $this->getContainer();
+		$c->addShared( Csrf::class );
+		$c->addShared( CsrfMiddleware::class )->addArguments( [ Csrf::class ] );
 	}
 }

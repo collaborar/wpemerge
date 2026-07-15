@@ -43,7 +43,7 @@ class WPEmerge_Tests_Bootstrap {
 		define( 'WPEMERGE_TEST_DIR', $this->tests_dir );
 
 		if ( ! defined( 'SCRIPT_DEBUG' ) ) {
-			define( 'SCRIPT_DEBUG', false );
+			define( 'SCRIPT_DEBUG', true );
 		}
 
 		// load dependencies

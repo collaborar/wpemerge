@@ -9,27 +9,26 @@
 
 namespace WPEmerge\Application;
 
-use Pimple\Container;
+use Psr\Container\ContainerInterface;
 use WPEmerge\Exceptions\ClassNotFoundException;
 
 /**
  * Generic class instance factory.
+ * Checks the container first, falls back to direct instantiation.
  */
 class GenericFactory {
 	/**
 	 * Container.
-	 *
-	 * @var Container
 	 */
-	protected $container = null;
+	protected ContainerInterface $container;
 
 	/**
 	 * Constructor.
 	 *
 	 * @codeCoverageIgnore
-	 * @param Container $container
+	 * @param ContainerInterface $container
 	 */
-	public function __construct( Container $container ) {
+	public function __construct( ContainerInterface $container ) {
 		$this->container = $container;
 	}
 
@@ -40,9 +39,9 @@ class GenericFactory {
 	 * @param  string $class
 	 * @return object
 	 */
-	public function make( $class ) {
-		if ( isset( $this->container[ $class ] ) ) {
-			return $this->container[ $class ];
+	public function make( string $class ): mixed {
+		if ( $this->container->has( $class ) ) {
+			return $this->container->get( $class );
 		}
 
 		if ( ! class_exists( $class ) ) {

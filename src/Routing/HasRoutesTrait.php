@@ -21,7 +21,7 @@ trait HasRoutesTrait {
 	 *
 	 * @var RouteInterface[]
 	 */
-	protected $routes = [];
+	protected array $routes = [];
 
 	/**
 	 * Get routes.
@@ -29,7 +29,7 @@ trait HasRoutesTrait {
 	 * @codeCoverageIgnore
 	 * @return RouteInterface[]
 	 */
-	public function getRoutes() {
+	public function getRoutes(): array {
 		return $this->routes;
 	}
 
@@ -39,7 +39,7 @@ trait HasRoutesTrait {
 	 * @param  RouteInterface $route
 	 * @return void
 	 */
-	public function addRoute( RouteInterface $route ) {
+	public function addRoute( RouteInterface $route ): void {
 		$routes = $this->getRoutes();
 		$name = $route->getAttribute( 'name' );
 
@@ -64,7 +64,7 @@ trait HasRoutesTrait {
 	 * @param  RouteInterface $route
 	 * @return void
 	 */
-	public function removeRoute( RouteInterface $route ) {
+	public function removeRoute( RouteInterface $route ): void {
 		$routes = $this->getRoutes();
 
 		$index = array_search( $route, $routes, true );

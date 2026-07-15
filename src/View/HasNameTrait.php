@@ -12,17 +12,15 @@ namespace WPEmerge\View;
 trait HasNameTrait {
 	/**
 	 * Name.
-	 *
-	 * @var string
 	 */
-	protected $name = '';
+	protected string $name = '';
 
 	/**
 	 * Get name.
 	 *
 	 * @return string
 	 */
-	public function getName() {
+	public function getName(): string {
 		return $this->name;
 	}
 
@@ -32,7 +30,7 @@ trait HasNameTrait {
 	 * @param  string $name
 	 * @return static $this
 	 */
-	public function setName( $name ) {
+	public function setName( string $name ): static {
 		$this->name = $name;
 		return $this;
 	}

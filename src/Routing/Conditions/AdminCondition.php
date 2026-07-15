@@ -19,17 +19,13 @@ use WPEmerge\Requests\RequestInterface;
 class AdminCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * Menu slug.
-	 *
-	 * @var string
 	 */
-	protected $menu = '';
+	protected string $menu = '';
 
 	/**
 	 * Parent menu slug.
-	 *
-	 * @var string
 	 */
-	protected $parent_menu = '';
+	protected string $parent_menu = '';
 
 	/**
 	 * Constructor
@@ -38,7 +34,7 @@ class AdminCondition implements ConditionInterface, UrlableInterface {
 	 * @param string $menu
 	 * @param string $parent_menu
 	 */
-	public function __construct( $menu, $parent_menu = '' ) {
+	public function __construct( string $menu, string $parent_menu = '' ) {
 		$this->menu = $menu;
 		$this->parent_menu = $parent_menu;
 	}
@@ -48,14 +44,14 @@ class AdminCondition implements ConditionInterface, UrlableInterface {
 	 *
 	 * @return boolean
 	 */
-	protected function isAdminPage() {
+	protected function isAdminPage(): bool {
 		return is_admin() && ! wp_doing_ajax();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		if ( ! $this->isAdminPage() ) {
 			return false;
 		}
@@ -72,7 +68,7 @@ class AdminCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return [
 			'menu' => $this->menu,
 			'parent_menu' => $this->parent_menu,
@@ -83,7 +79,7 @@ class AdminCondition implements ConditionInterface, UrlableInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function toUrl( $arguments = [] ) {
+	public function toUrl( array $arguments = [] ): string {
 		if ( ! function_exists( 'menu_page_url' ) ) {
 			// Attempted to resolve an admin url while not in the admin which can only happen
 			// by mistake as admin routes are defined in the admin context only.

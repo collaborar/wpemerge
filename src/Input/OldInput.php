@@ -18,17 +18,13 @@ use WPEmerge\Support\Arr;
 class OldInput {
 	/**
 	 * Flash service.
-	 *
-	 * @var Flash
 	 */
-	protected $flash = null;
+	protected Flash $flash;
 
 	/**
 	 * Key to store the flashed data with.
-	 *
-	 * @var string
 	 */
-	protected $flash_key = '';
+	protected string $flash_key = '';
 
 	/**
 	 * Constructor.
@@ -37,7 +33,7 @@ class OldInput {
 	 * @param Flash  $flash
 	 * @param string $flash_key
 	 */
-	public function __construct( Flash $flash, $flash_key = '__wpemergeOldInput' ) {
+	public function __construct( Flash $flash, string $flash_key = '__wpemergeOldInput' ) {
 		$this->flash = $flash;
 		$this->flash_key = $flash_key;
 	}
@@ -47,7 +43,7 @@ class OldInput {
 	 *
 	 * @return boolean
 	 */
-	public function enabled() {
+	public function enabled(): bool {
 		return $this->flash->enabled();
 	}
 
@@ -58,7 +54,7 @@ class OldInput {
 	 * @param  mixed  $default
 	 * @return mixed
 	 */
-	public function get( $key, $default = null ) {
+	public function get( string $key, mixed $default = null ): mixed {
 		return Arr::get( $this->flash->get( $this->flash_key, [] ), $key, $default );
 	}
 
@@ -67,7 +63,7 @@ class OldInput {
 	 *
 	 * @param array $input
 	 */
-	public function set( $input ) {
+	public function set( array $input ): void {
 		$this->flash->add( $this->flash_key, $input );
 	}
 
@@ -76,7 +72,7 @@ class OldInput {
 	 *
 	 * @return void
 	 */
-	public function clear() {
+	public function clear(): void {
 		$this->flash->clear( $this->flash_key );
 	}
 }

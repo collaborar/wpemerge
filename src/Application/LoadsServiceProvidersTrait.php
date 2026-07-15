@@ -9,7 +9,8 @@
 
 namespace WPEmerge\Application;
 
-use Pimple\Container;
+use League\Container\Container;
+use League\Container\ServiceProvider\AbstractServiceProvider;
 use WPEmerge\Controllers\ControllersServiceProvider;
 use WPEmerge\Csrf\CsrfServiceProvider;
 use WPEmerge\Exceptions\ConfigurationException;
@@ -21,7 +22,6 @@ use WPEmerge\Middleware\MiddlewareServiceProvider;
 use WPEmerge\Requests\RequestsServiceProvider;
 use WPEmerge\Responses\ResponsesServiceProvider;
 use WPEmerge\Routing\RoutingServiceProvider;
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
 use WPEmerge\Support\Arr;
 use WPEmerge\View\ViewServiceProvider;
 
@@ -30,11 +30,11 @@ use WPEmerge\View\ViewServiceProvider;
  */
 trait LoadsServiceProvidersTrait {
 	/**
-	 * Array of default service providers.
+	 * Array of default service provider class names.
 	 *
-	 * @var string[]
+	 * @var class-string<AbstractServiceProvider>[]
 	 */
-	protected $service_providers = [
+	protected array $service_providers = [
 		ApplicationServiceProvider::class,
 		KernelsServiceProvider::class,
 		ExceptionsServiceProvider::class,
@@ -50,61 +50,49 @@ trait LoadsServiceProvidersTrait {
 	];
 
 	/**
-	 * Register and bootstrap all service providers.
+	 * Instantiated provider instances, keyed by class name.
+	 * Retained so WordPress hooks added in boot() can be removed later.
+	 *
+	 * @var array<class-string, AbstractServiceProvider>
+	 */
+	protected array $provider_instances = [];
+
+	/**
+	 * Register all service providers with the League container.
 	 *
 	 * @codeCoverageIgnore
 	 * @param  Container $container
 	 * @return void
 	 */
-	protected function loadServiceProviders( Container $container ) {
-		$container[ WPEMERGE_SERVICE_PROVIDERS_KEY ] = array_merge(
-			$this->service_providers,
-			Arr::get( $container[ WPEMERGE_CONFIG_KEY ], 'providers', [] )
-		);
+	protected function loadServiceProviders( Container $container ): void {
+		$config     = $container->get( Configuration::class );
+		$providers  = [
+			...$this->service_providers,
+			...$config->get( 'providers', [] ),
+		];
 
-		$service_providers = array_map( function ( $service_provider ) use ( $container ) {
-			if ( ! is_subclass_of( $service_provider, ServiceProviderInterface::class ) ) {
+		foreach ( $providers as $providerClass ) {
+			if ( ! is_subclass_of( $providerClass, AbstractServiceProvider::class ) ) {
 				throw new ConfigurationException(
-					'The following class is not defined or does not implement ' .
-					ServiceProviderInterface::class . ': ' . $service_provider
+					'The following class is not defined or does not extend ' .
+					AbstractServiceProvider::class . ': ' . $providerClass
 				);
 			}
 
-			// Provide container access to the service provider instance
-			// so bootstrap hooks can be unhooked e.g.:
-			// remove_action( 'some_action', [\App::resolve( SomeServiceProvider::class ), 'methodAddedToAction'] );
-			$container[ $service_provider ] = new $service_provider();
-
-			return $container[ $service_provider ];
-		}, $container[ WPEMERGE_SERVICE_PROVIDERS_KEY ] );
-
-		$this->registerServiceProviders( $service_providers, $container );
-		$this->bootstrapServiceProviders( $service_providers, $container );
-	}
-
-	/**
-	 * Register all service providers.
-	 *
-	 * @param  ServiceProviderInterface[] $service_providers
-	 * @param  Container                  $container
-	 * @return void
-	 */
-	protected function registerServiceProviders( $service_providers, Container $container ) {
-		foreach ( $service_providers as $provider ) {
-			$provider->register( $container );
+			$instance = new $providerClass();
+			$this->provider_instances[ $providerClass ] = $instance;
+			$container->addServiceProvider( $instance );
 		}
 	}
 
 	/**
-	 * Bootstrap all service providers.
+	 * Get a registered service provider instance by class name.
+	 * Useful for removing WordPress hooks added during boot().
 	 *
-	 * @param  ServiceProviderInterface[] $service_providers
-	 * @param  Container                  $container
-	 * @return void
+	 * @param  class-string $providerClass
+	 * @return AbstractServiceProvider|null
 	 */
-	protected function bootstrapServiceProviders( $service_providers, Container $container ) {
-		foreach ( $service_providers as $provider ) {
-			$provider->bootstrap( $container );
-		}
+	public function getProvider( string $providerClass ): ?AbstractServiceProvider {
+		return $this->provider_instances[ $providerClass ] ?? null;
 	}
 }

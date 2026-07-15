@@ -97,7 +97,7 @@ install_test_suite() {
 	WP_CORE_DIR=$(echo $WP_CORE_DIR | sed -r 's/:/\\:/g')
 
 	# Replace variables in the config file
-	sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR':" wp-tests-config.php 2> /dev/null
+	sed $ioption "s:dirname( __FILE__ ) . '/src/':dirname( __FILE__ ) . '/../wordpress/':" wp-tests-config.php 2> /dev/null
 	sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" wp-tests-config.php 2> /dev/null
 	sed $ioption "s/yourusernamehere/$DB_USER/" wp-tests-config.php 2> /dev/null
 	sed $ioption "s/yourpasswordhere/$DB_PASS/" wp-tests-config.php 2> /dev/null

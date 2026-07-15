@@ -9,34 +9,30 @@
 
 namespace WPEmerge\Input;
 
-use WPEmerge\ServiceProviders\ServiceProviderInterface;
+use League\Container\ServiceProvider\AbstractServiceProvider;
+use League\Container\ServiceProvider\BootableServiceProviderInterface;
+use WPEmerge\Application\Application;
+use WPEmerge\Flash\Flash;
 
 /**
  * Provide old input dependencies.
  *
  * @codeCoverageIgnore
  */
-class OldInputServiceProvider implements ServiceProviderInterface {
-	/**
-	 * {@inheritDoc}
-	 */
-	public function register( $container ) {
-		$container[ WPEMERGE_OLD_INPUT_KEY ] = function ( $c ) {
-			return new OldInput( $c[ WPEMERGE_FLASH_KEY ] );
-		};
+class OldInputServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface {
 
-		$container[ OldInputMiddleware::class ] = function ( $c ) {
-			return new OldInputMiddleware( $c[ WPEMERGE_OLD_INPUT_KEY ] );
-		};
-
-		$app = $container[ WPEMERGE_APPLICATION_KEY ];
-		$app->alias( 'oldInput', WPEMERGE_OLD_INPUT_KEY );
+	public function provides( string $id ): bool {
+		return in_array( $id, [OldInput::class, OldInputMiddleware::class], true );
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public function bootstrap( $container ) {
-		// Nothing to bootstrap.
+	public function boot(): void {
+		$app = $this->getContainer()->get( Application::class );
+		$app->alias( 'oldInput', OldInput::class );
+	}
+
+	public function register(): void {
+		$c = $this->getContainer();
+		$c->addShared( OldInput::class )->addArguments( [ Flash::class ] );
+		$c->addShared( OldInputMiddleware::class )->addArguments( [ OldInput::class ] );
 	}
 }

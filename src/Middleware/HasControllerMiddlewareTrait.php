@@ -18,7 +18,7 @@ trait HasControllerMiddlewareTrait {
 	 *
 	 * @var ControllerMiddleware[]
 	 */
-	protected $middleware = [];
+	protected array $middleware = [];
 
 	/**
 	 * Get middleware.
@@ -26,7 +26,7 @@ trait HasControllerMiddlewareTrait {
 	 * @param  string   $method
 	 * @return string[]
 	 */
-	public function getMiddleware( $method ) {
+	public function getMiddleware( string $method ): array {
 		$middleware = array_filter( $this->middleware, function ( ControllerMiddleware $middleware ) use ( $method ) {
 			return $middleware->appliesTo( $method );
 		} );
@@ -36,7 +36,7 @@ trait HasControllerMiddlewareTrait {
 		}, $middleware );
 
 		if ( ! empty( $middleware ) ) {
-			$middleware = call_user_func_array( 'array_merge', $middleware );
+			$middleware = array_merge( ...$middleware );
 		}
 
 		return $middleware;
@@ -48,13 +48,13 @@ trait HasControllerMiddlewareTrait {
 	 * @param  string|string[]      $middleware
 	 * @return ControllerMiddleware
 	 */
-	public function addMiddleware( $middleware ) {
+	public function addMiddleware( string|array $middleware ): ControllerMiddleware {
 		$controller_middleware = new ControllerMiddleware( $middleware );
 
-		$this->middleware = array_merge(
-			$this->middleware,
-			[$controller_middleware]
-		);
+		$this->middleware = [
+			...$this->middleware,
+			$controller_middleware,
+		];
 
 		return $controller_middleware;
 	}
@@ -66,7 +66,7 @@ trait HasControllerMiddlewareTrait {
 	 * @param  string|string[]      $middleware
 	 * @return ControllerMiddleware
 	 */
-	public function middleware( $middleware ) {
-		return call_user_func_array( [$this, 'addMiddleware'], func_get_args() );
+	public function middleware( string|array $middleware ): ControllerMiddleware {
+		return $this->addMiddleware( $middleware );
 	}
 }

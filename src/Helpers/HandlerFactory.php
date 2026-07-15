@@ -18,10 +18,8 @@ use WPEmerge\Application\GenericFactory;
 class HandlerFactory {
 	/**
 	 * Injection Factory.
-	 *
-	 * @var GenericFactory
 	 */
-	protected $factory = null;
+	protected GenericFactory $factory;
 
 	/**
 	 * Constructor.
@@ -42,7 +40,7 @@ class HandlerFactory {
 	 * @param  string         $namespace
 	 * @return Handler
 	 */
-	public function make( $raw_handler, $default_method = '', $namespace = '' ) {
+	public function make( string|Closure $raw_handler, string $default_method = '', string $namespace = '' ): Handler {
 		return new Handler( $this->factory, $raw_handler, $default_method, $namespace );
 	}
 }

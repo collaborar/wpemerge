@@ -19,17 +19,13 @@ use WPEmerge\Requests\RequestInterface;
 class QueryVarCondition implements ConditionInterface {
 	/**
 	 * Query var name to check against.
-	 *
-	 * @var string|null
 	 */
-	protected $query_var = null;
+	protected ?string $query_var = null;
 
 	/**
 	 * Query var value to check against.
-	 *
-	 * @var string|null
 	 */
-	protected $value = '';
+	protected ?string $value = '';
 
 	/**
 	 * Constructor.
@@ -38,7 +34,7 @@ class QueryVarCondition implements ConditionInterface {
 	 * @param string      $query_var
 	 * @param string|null $value
 	 */
-	public function __construct( $query_var, $value = null ) {
+	public function __construct( string $query_var, ?string $value = null ) {
 		$this->query_var = $query_var;
 		$this->value = $value;
 	}
@@ -46,7 +42,7 @@ class QueryVarCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		$query_var_value = get_query_var( $this->query_var, null );
 
 		if ( $query_var_value === null ) {
@@ -63,7 +59,7 @@ class QueryVarCondition implements ConditionInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return ['query_var' => $this->query_var, 'value' => $this->value];
 	}
 }

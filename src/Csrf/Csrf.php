@@ -17,32 +17,27 @@ use WPEmerge\Requests\RequestInterface;
 class Csrf {
 	/**
 	 * Convenience header to check for the token.
-	 *
-	 * @var string
 	 */
-	protected $header = 'X-CSRF-TOKEN';
+	protected string $header = 'X-CSRF-TOKEN';
 
 	/**
 	 * GET/POST parameter key to check for the token.
-	 *
-	 * @var string
 	 */
-	protected $key = '';
+	protected string $key = '';
 
 	/**
 	 * Maximum token lifetime.
 	 *
 	 * @link https://codex.wordpress.org/Function_Reference/wp_verify_nonce
-	 * @var integer
 	 */
-	protected $maximum_lifetime = 2;
+	protected int $maximum_lifetime = 2;
 
 	/**
 	 * Last generated tokens.
 	 *
 	 * @var array<string, string>
 	 */
-	protected $tokens = [];
+	protected array $tokens = [];
 
 	/**
 	 * Constructor.
@@ -51,7 +46,7 @@ class Csrf {
 	 * @param string  $key
 	 * @param integer $maximum_lifetime
 	 */
-	public function __construct( $key = '__wpemergeCsrfToken', $maximum_lifetime = 2 ) {
+	public function __construct( string $key = '__wpemergeCsrfToken', int $maximum_lifetime = 2 ) {
 		$this->key = $key;
 		$this->maximum_lifetime = $maximum_lifetime;
 	}
@@ -62,7 +57,7 @@ class Csrf {
 	 * @param  int|string $action
 	 * @return string
 	 */
-	public function getToken( $action = -1 ) {
+	public function getToken( int|string $action = -1 ): string {
 		if ( ! isset( $this->tokens[ $action ] ) ) {
 			return $this->generateToken( $action );
 		}
@@ -101,7 +96,7 @@ class Csrf {
 	 * @param  int|string $action
 	 * @return string
 	 */
-	public function generateToken( $action = -1 ) {
+	public function generateToken( int|string $action = -1 ): string {
 		$action = $action === -1 ? session_id() : $action;
 
 		$this->tokens[ $action ] = wp_create_nonce( $action );
@@ -116,7 +111,7 @@ class Csrf {
 	 * @param  int|string $action
 	 * @return boolean
 	 */
-	public function isValidToken( $token, $action = -1 ) {
+	public function isValidToken( string $token, int|string $action = -1 ): bool {
 		$action = $action === -1 ? session_id() : $action;
 		$lifetime = (int) wp_verify_nonce( $token, $action );
 
@@ -130,7 +125,7 @@ class Csrf {
 	 * @param  int|string $action
 	 * @return string
 	 */
-	public function url( $url, $action = -1 ) {
+	public function url( string $url, int|string $action = -1 ): string {
 		return add_query_arg( $this->key, $this->getToken( $action ), $url );
 	}
 
@@ -140,7 +135,7 @@ class Csrf {
 	 * @param  int|string $action
 	 * @return void
 	 */
-	public function field( $action = -1 ) {
+	public function field( int|string $action = -1 ): void {
 		echo sprintf(
 			'<input type="hidden" name="%1$s" value="%2$s" />',
 			esc_attr( $this->key ),

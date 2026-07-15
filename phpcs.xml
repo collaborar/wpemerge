@@ -2,7 +2,7 @@
 <ruleset name="WPEmerge">
 	<description>WP Emerge Coding Standard</description>
 	<config name="installed_paths" value="vendor/phpcompatibility/php-compatibility" />
-	<config name="testVersion" value="5.5-"/>
+	<config name="testVersion" value="8.4-"/>
 
 	<!-- Files -->
 	<file>./src</file>

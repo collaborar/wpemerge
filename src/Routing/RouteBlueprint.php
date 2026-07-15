@@ -22,17 +22,13 @@ class RouteBlueprint {
 
 	/**
 	 * Router.
-	 *
-	 * @var Router
 	 */
-	protected $router = null;
+	protected Router $router;
 
 	/**
 	 * View service.
-	 *
-	 * @var ViewService
 	 */
-	protected $view_service = null;
+	protected ViewService $view_service;
 
 	/**
 	 * Constructor.
@@ -52,7 +48,7 @@ class RouteBlueprint {
 	 * @param  string[] $methods
 	 * @return static   $this
 	 */
-	public function methods( $methods ) {
+	public function methods( array $methods ): static {
 		$methods = $this->router->mergeMethodsAttribute(
 			(array) $this->getAttribute( 'methods', [] ),
 			(array) $methods
@@ -68,7 +64,7 @@ class RouteBlueprint {
 	 * @param  array<string, string> $where
 	 * @return static                $this
 	 */
-	public function url( $url, $where = [] ) {
+	public function url( string $url, array $where = [] ): static {
 		return $this->where( 'url', $url, $where );
 	}
 
@@ -79,9 +75,9 @@ class RouteBlueprint {
 	 * @param  mixed                           ,...$arguments
 	 * @return static                          $this
 	 */
-	public function where( $condition ) {
+	public function where( string|array|ConditionInterface|null $condition, mixed ...$arguments ): static {
 		if ( ! $condition instanceof ConditionInterface ) {
-			$condition = func_get_args();
+			$condition = [$condition, ...$arguments];
 		}
 
 		$condition = $this->router->mergeConditionAttribute(
@@ -98,7 +94,7 @@ class RouteBlueprint {
 	 * @param  string|string[] $middleware
 	 * @return static          $this
 	 */
-	public function middleware( $middleware ) {
+	public function middleware( string|array $middleware ): static {
 		$middleware = $this->router->mergeMiddlewareAttribute(
 			(array) $this->getAttribute( 'middleware', [] ),
 			(array) $middleware
@@ -115,7 +111,7 @@ class RouteBlueprint {
 	 * @param  string $namespace
 	 * @return static $this
 	 */
-	public function setNamespace( $namespace ) {
+	public function setNamespace( string $namespace ): static {
 		$namespace = $this->router->mergeNamespaceAttribute(
 			$this->getAttribute( 'namespace', '' ),
 			$namespace
@@ -130,7 +126,7 @@ class RouteBlueprint {
 	 * @param  callable $query
 	 * @return static   $this
 	 */
-	public function query( $query ) {
+	public function query( callable $query ): static {
 		$query = $this->router->mergeQueryAttribute(
 			$this->getAttribute( 'query', null ),
 			$query
@@ -145,7 +141,7 @@ class RouteBlueprint {
 	 * @param  string $name
 	 * @return static $this
 	 */
-	public function name( $name ) {
+	public function name( string $name ): static {
 		return $this->attribute( 'name', $name );
 	}
 
@@ -155,7 +151,7 @@ class RouteBlueprint {
 	 * @param  Closure|string $routes Closure or path to file.
 	 * @return void
 	 */
-	public function group( $routes ) {
+	public function group( Closure|string $routes ): void {
 		$this->router->group( $this->getAttributes(), $routes );
 	}
 
@@ -165,7 +161,7 @@ class RouteBlueprint {
 	 * @param  string|Closure $handler
 	 * @return void
 	 */
-	public function handle( $handler = '' ) {
+	public function handle( string|Closure $handler = '' ): void {
 		if ( ! empty( $handler ) ) {
 			$this->attribute( 'handler', $handler );
 		}
@@ -187,7 +183,7 @@ class RouteBlueprint {
 	 * @param  string|string[] $views
 	 * @return void
 	 */
-	public function view( $views ) {
+	public function view( string|array $views ): void {
 		$this->handle( function () use ( $views ) {
 			return $this->view_service->make( $views );
 		} );
@@ -199,7 +195,7 @@ class RouteBlueprint {
 	 * @param  string|Closure $handler
 	 * @return void
 	 */
-	public function all( $handler = '' ) {
+	public function all( string|Closure $handler = '' ): void {
 		$this->any()->url( '*' )->handle( $handler );
 	}
 
@@ -208,7 +204,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function get() {
+	public function get(): static {
 		return $this->methods( ['GET', 'HEAD'] );
 	}
 
@@ -217,7 +213,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function post() {
+	public function post(): static {
 		return $this->methods( ['POST'] );
 	}
 
@@ -226,7 +222,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function put() {
+	public function put(): static {
 		return $this->methods( ['PUT'] );
 	}
 
@@ -235,7 +231,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function patch() {
+	public function patch(): static {
 		return $this->methods( ['PATCH'] );
 	}
 
@@ -244,7 +240,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function delete() {
+	public function delete(): static {
 		return $this->methods( ['DELETE'] );
 	}
 
@@ -253,7 +249,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function options() {
+	public function options(): static {
 		return $this->methods( ['OPTIONS'] );
 	}
 
@@ -262,7 +258,7 @@ class RouteBlueprint {
 	 *
 	 * @return static $this
 	 */
-	public function any() {
+	public function any(): static {
 		return $this->methods( ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] );
 	}
 }

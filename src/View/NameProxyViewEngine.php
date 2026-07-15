@@ -17,24 +17,18 @@ use WPEmerge\Application\Application;
 class NameProxyViewEngine implements ViewEngineInterface {
 	/**
 	 * Container key of default engine to use
-	 *
-	 * @var string
 	 */
-	protected $default = WPEMERGE_VIEW_PHP_VIEW_ENGINE_KEY;
+	protected string $default = PhpViewEngine::class;
 
 	/**
 	 * Application.
-	 *
-	 * @var Application
 	 */
-	protected $app = null;
+	protected Application $app;
 
 	/**
 	 * Array of filename_suffix=>engine_container_key bindings
-	 *
-	 * @var array
 	 */
-	protected $bindings = [];
+	protected array $bindings = [];
 
 	/**
 	 * Constructor
@@ -43,7 +37,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 * @param array       $bindings
 	 * @param string      $default
 	 */
-	public function __construct( Application $app, $bindings, $default = '' ) {
+	public function __construct( Application $app, array $bindings, string $default = '' ) {
 		$this->app = $app;
 		$this->bindings = $bindings;
 
@@ -55,7 +49,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function exists( $view ) {
+	public function exists( string $view ): bool {
 		$engine_key = $this->getBindingForFile( $view );
 		$engine = $this->app->resolve( $engine_key );
 		return $engine->exists( $view );
@@ -64,7 +58,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function canonical( $view ) {
+	public function canonical( string $view ): string {
 		$engine_key = $this->getBindingForFile( $view );
 		$engine = $this->app->resolve( $engine_key );
 		return $engine->canonical( $view );
@@ -74,7 +68,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 * {@inheritDoc}
 	 * @throws ViewNotFoundException
 	 */
-	public function make( $views ) {
+	public function make( array $views ) {
 		foreach ( $views as $view ) {
 			if ( $this->exists( $view ) ) {
 				$engine_key = $this->getBindingForFile( $view );
@@ -91,7 +85,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 *
 	 * @return string $binding
 	 */
-	public function getDefaultBinding() {
+	public function getDefaultBinding(): string {
 		return $this->default;
 	}
 
@@ -100,7 +94,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 *
 	 * @return array  $bindings
 	 */
-	public function getBindings() {
+	public function getBindings(): array {
 		return $this->bindings;
 	}
 
@@ -110,7 +104,7 @@ class NameProxyViewEngine implements ViewEngineInterface {
 	 * @param  string $file
 	 * @return string
 	 */
-	public function getBindingForFile( $file ) {
+	public function getBindingForFile( string $file ): string {
 		$engine_key = $this->default;
 
 		foreach ( $this->bindings as $suffix => $engine ) {

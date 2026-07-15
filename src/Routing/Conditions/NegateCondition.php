@@ -17,10 +17,8 @@ use WPEmerge\Requests\RequestInterface;
 class NegateCondition implements ConditionInterface {
 	/**
 	 * Condition to negate.
-	 *
-	 * @var ConditionInterface
 	 */
-	protected $condition = null;
+	protected ConditionInterface $condition;
 
 	/**
 	 * Constructor.
@@ -28,21 +26,21 @@ class NegateCondition implements ConditionInterface {
 	 * @codeCoverageIgnore
 	 * @param ConditionInterface $condition
 	 */
-	public function __construct( $condition ) {
+	public function __construct( ConditionInterface $condition ) {
 		$this->condition = $condition;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		return ! $this->condition->isSatisfied( $request );
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		return $this->condition->getArguments( $request );
 	}
 }

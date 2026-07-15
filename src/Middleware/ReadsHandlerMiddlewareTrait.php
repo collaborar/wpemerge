@@ -21,7 +21,7 @@ trait ReadsHandlerMiddlewareTrait {
 	 * @param  Handler  $handler
 	 * @return string[]
 	 */
-	protected function getHandlerMiddleware( Handler $handler ) {
+	protected function getHandlerMiddleware( Handler $handler ): array {
 		$instance = $handler->make();
 
 		if ( ! $instance instanceof HasControllerMiddlewareInterface ) {

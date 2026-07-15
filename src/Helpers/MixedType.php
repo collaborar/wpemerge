@@ -17,7 +17,7 @@ class MixedType {
 	 * @param  mixed $argument
 	 * @return array
 	 */
-	public static function toArray( $argument ) {
+	public static function toArray( mixed $argument ): array {
 		if ( ! is_array( $argument ) ) {
 			$argument = [$argument];
 		}
@@ -40,22 +40,22 @@ class MixedType {
 	 * @return mixed
 	 */
 	public static function value(
-		$entity,
-		$arguments = [],
-		$method = '__invoke',
-		$instantiator = null
-	) {
+		mixed $entity,
+		array $arguments = [],
+		string $method = '__invoke',
+		?callable $instantiator = null
+	): mixed {
 		if ( is_callable( $entity ) ) {
-			return call_user_func_array( $entity, $arguments );
+			return $entity( ...$arguments );
 		}
 
 		if ( is_object( $entity ) ) {
-			return call_user_func_array( [$entity, $method], $arguments );
+			return $entity->{$method}( ...$arguments );
 		}
 
 		if ( static::isClass( $entity ) ) {
 			$instantiator = $instantiator ?? [static::class, 'instantiate'];
-			return call_user_func_array( [call_user_func( $instantiator, $entity ), $method], $arguments );
+			return call_user_func( $instantiator, $entity )->{$method}( ...$arguments );
 		}
 
 		return $entity;
@@ -67,7 +67,7 @@ class MixedType {
 	 * @param  mixed   $class_name
 	 * @return boolean
 	 */
-	public static function isClass( $class_name ) {
+	public static function isClass( mixed $class_name ): bool {
 		return ( is_string( $class_name ) && class_exists( $class_name ) );
 	}
 
@@ -77,7 +77,7 @@ class MixedType {
 	 * @param mixed $class_name
 	 * @return string
 	 */
-	public static function classBasename( $class_name ) {
+	public static function classBasename( mixed $class_name ): string {
 		$class_name = is_object( $class_name ) ? get_class( $class_name ) : $class_name;
 		return basename( str_replace( '\\', '/', $class_name ) );
 	}
@@ -88,7 +88,7 @@ class MixedType {
 	 * @param  string $class_name
 	 * @return object
 	 */
-	public static function instantiate( $class_name ) {
+	public static function instantiate( string $class_name ): object {
 		return new $class_name();
 	}
 
@@ -100,7 +100,7 @@ class MixedType {
 	 * @param  string $slash
 	 * @return string
 	 */
-	public static function normalizePath( $path, $slash = DIRECTORY_SEPARATOR ) {
+	public static function normalizePath( string $path, string $slash = DIRECTORY_SEPARATOR ): string {
 		return preg_replace( '~[' . preg_quote( '/\\', '~' ) . ']+~', $slash, $path );
 	}
 
@@ -111,7 +111,7 @@ class MixedType {
 	 * @param  string $slash
 	 * @return string
 	 */
-	public static function addTrailingSlash( $path, $slash = DIRECTORY_SEPARATOR ) {
+	public static function addTrailingSlash( string $path, string $slash = DIRECTORY_SEPARATOR ): string {
 		$path = static::normalizePath( $path, $slash );
 		$path = preg_replace( '~' . preg_quote( $slash, '~' ) . '*$~', $slash, $path );
 		return $path;
@@ -124,7 +124,7 @@ class MixedType {
 	 * @param  string $slash
 	 * @return string
 	 */
-	public static function removeTrailingSlash( $path, $slash = DIRECTORY_SEPARATOR ) {
+	public static function removeTrailingSlash( string $path, string $slash = DIRECTORY_SEPARATOR ): string {
 		$path = static::normalizePath( $path, $slash );
 		$path = preg_replace( '~' . preg_quote( $slash, '~' ) . '+$~', '', $path );
 		return $path;

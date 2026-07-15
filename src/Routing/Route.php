@@ -24,7 +24,7 @@ class Route implements RouteInterface, HasQueryFilterInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function isSatisfied( RequestInterface $request ) {
+	public function isSatisfied( RequestInterface $request ): bool {
 		$methods = $this->getAttribute( 'methods', [] );
 		$condition = $this->getAttribute( 'condition' );
 
@@ -42,7 +42,7 @@ class Route implements RouteInterface, HasQueryFilterInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function getArguments( RequestInterface $request ) {
+	public function getArguments( RequestInterface $request ): array {
 		$condition = $this->getAttribute( 'condition' );
 
 		if ( ! $condition instanceof ConditionInterface ) {

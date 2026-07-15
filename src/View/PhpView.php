@@ -11,6 +11,7 @@ namespace WPEmerge\View;
 
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Render a view file with php.
@@ -20,24 +21,18 @@ class PhpView implements ViewInterface {
 
 	/**
 	 * PHP view engine.
-	 *
-	 * @var PhpViewEngine
 	 */
-	protected $engine = null;
+	protected PhpViewEngine $engine;
 
 	/**
 	 * Filepath to view.
-	 *
-	 * @var string
 	 */
-	protected $filepath = '';
+	protected string $filepath = '';
 
 	/**
 	 * Layout to use.
-	 *
-	 * @var ViewInterface|null
 	 */
-	protected $layout = null;
+	protected ?ViewInterface $layout = null;
 
 	/**
 	 * Constructor.
@@ -54,7 +49,7 @@ class PhpView implements ViewInterface {
 	 *
 	 * @return string
 	 */
-	public function getFilepath() {
+	public function getFilepath(): string {
 		return $this->filepath;
 	}
 
@@ -64,7 +59,7 @@ class PhpView implements ViewInterface {
 	 * @param  string $filepath
 	 * @return static $this
 	 */
-	public function setFilepath( $filepath ) {
+	public function setFilepath( string $filepath ): static {
 		$this->filepath = $filepath;
 		return $this;
 	}
@@ -74,7 +69,7 @@ class PhpView implements ViewInterface {
 	 *
 	 * @return ViewInterface|null
 	 */
-	public function getLayout() {
+	public function getLayout(): ?ViewInterface {
 		return $this->layout;
 	}
 
@@ -84,7 +79,7 @@ class PhpView implements ViewInterface {
 	 * @param  ViewInterface|null $layout
 	 * @return static             $this
 	 */
-	public function setLayout( $layout ) {
+	public function setLayout( ?ViewInterface $layout ): static {
 		$this->layout = $layout;
 		return $this;
 	}
@@ -93,7 +88,7 @@ class PhpView implements ViewInterface {
 	 * {@inheritDoc}
 	 * @throws ViewException
 	 */
-	public function toString() {
+	public function toString(): string {
 		if ( empty( $this->getName() ) ) {
 			throw new ViewException( 'View must have a name.' );
 		}
@@ -115,7 +110,7 @@ class PhpView implements ViewInterface {
 	 * {@inheritDoc}
 	 * @throws ViewException
 	 */
-	public function toResponse() {
+	public function toResponse(): ResponseInterface {
 		return (new Response())
 			->withHeader( 'Content-Type', 'text/html' )
 			->withBody( Psr7\Utils::streamFor( $this->toString() ) );

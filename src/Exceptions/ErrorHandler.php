@@ -21,34 +21,29 @@ use WPEmerge\Support\Arr;
 class ErrorHandler implements ErrorHandlerInterface {
 	/**
 	 * Response service.
-	 *
-	 * @var ResponseService
 	 */
-	protected $response_service = null;
+	protected ResponseService $response_service;
 
 	/**
 	 * Pretty handler.
-	 *
-	 * @var RunInterface|null
 	 */
-	protected $whoops = null;
+	protected ?RunInterface $whoops = null;
 
 	/**
 	 * Whether debug mode is enabled.
-	 *
-	 * @var boolean
 	 */
-	protected $debug = false;
+	protected bool $debug = false;
 
 	/**
 	 * Constructor.
 	 *
 	 * @codeCoverageIgnore
-	 * @param ResponseService   $response_service
-	 * @param RunInterface|null $whoops
-	 * @param boolean           $debug
 	 */
-	public function __construct( $response_service, $whoops, $debug = false ) {
+	public function __construct(
+		ResponseService $response_service,
+		?RunInterface $whoops = null,
+		bool $debug = false
+	) {
 		$this->response_service = $response_service;
 		$this->whoops = $whoops;
 		$this->debug = $debug;
@@ -58,7 +53,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * {@inheritDoc}
 	 * @codeCoverageIgnore
 	 */
-	public function register() {
+	public function register(): void {
 		if ( $this->debug && $this->whoops !== null ) {
 			$this->whoops->register();
 		}
@@ -68,7 +63,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * {@inheritDoc}
 	 * @codeCoverageIgnore
 	 */
-	public function unregister() {
+	public function unregister(): void {
 		if ( $this->debug && $this->whoops !== null ) {
 			$this->whoops->unregister();
 		}
@@ -80,7 +75,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * @param  PhpException            $exception
 	 * @return ResponseInterface|false
 	 */
-	protected function toResponse( $exception ) {
+	protected function toResponse( PhpException $exception ): ResponseInterface|false {
 		// @codeCoverageIgnoreStart
 		if ( $exception instanceof InvalidCsrfTokenException ) {
 			wp_nonce_ays( '' );
@@ -102,7 +97,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * @param  PhpException      $exception
 	 * @return ResponseInterface
 	 */
-	protected function toDebugResponse( RequestInterface $request, PhpException $exception ) {
+	protected function toDebugResponse( RequestInterface $request, PhpException $exception ): ResponseInterface {
 		if ( $request->isAjax() ) {
 			return $this->response_service->json( [
 				'message' => $exception->getMessage(),
@@ -129,7 +124,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * @param  PhpException      $exception
 	 * @return ResponseInterface
 	 */
-	protected function toPrettyErrorResponse( $exception ) {
+	protected function toPrettyErrorResponse( PhpException $exception ): ResponseInterface {
 		$method = RunInterface::EXCEPTION_HANDLER;
 		ob_start();
 		$this->whoops->$method( $exception );
@@ -141,7 +136,7 @@ class ErrorHandler implements ErrorHandlerInterface {
 	 * {@inheritDoc}
 	 * @throws PhpException
 	 */
-	public function getResponse( RequestInterface $request, PhpException $exception ) {
+	public function getResponse( RequestInterface $request, PhpException $exception ): ResponseInterface {
 		$response = $this->toResponse( $exception );
 
 		if ( $response !== false ) {
