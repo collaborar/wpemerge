@@ -151,6 +151,6 @@ class ApplicationTestKernelServiceProviderMock extends AbstractServiceProvider {
 		$mock->shouldReceive( 'bootstrap' )
 			->once();
 
-		$this->getContainer()->addShared( HttpKernelInterface::class, fn () => $mock );
+		$this->getContainer()->addShared( HttpKernelInterface::class, fn () => $mock, true );
 	}
 }
